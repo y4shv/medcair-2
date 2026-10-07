@@ -51,6 +51,8 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== "/" &&
     !user &&
     !request.nextUrl.pathname.startsWith("/login") &&
+    // Share links are opened by people the patient chooses, without an account.
+    !request.nextUrl.pathname.startsWith("/share") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
     // no user, potentially respond by redirecting the user to the login page
