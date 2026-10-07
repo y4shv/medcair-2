@@ -38,25 +38,7 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Get user profile to determine role
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("user_profiles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
-
-        if (profile?.role === "hospital") {
-          router.push("/hospital/dashboard");
-        } else if (profile?.role === "doctor") {
-          router.push("/doctor/dashboard");
-        } else {
-          router.push("/patient/dashboard");
-        }
-      } else {
-        router.push("/protected");
-      }
+      router.push("/patient/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {

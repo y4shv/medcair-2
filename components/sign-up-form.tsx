@@ -15,15 +15,6 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { UserRole } from "@/lib/types";
-import { useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 
 export function SignUpForm({
@@ -34,29 +25,10 @@ export function SignUpForm({
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [userRole, setUserRole] = useState<UserRole>("patient");
-  const [selectedHospital, setSelectedHospital] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [hospitals, setHospitals] = useState<{ id: string; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (userRole === "doctor") {
-      const fetchHospitals = async () => {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("hospitals")
-          .select("id, name");
-        if (!error && data) {
-          setHospitals(data);
-        }
-      };
-      fetchHospitals();
-    }
-  }, [userRole]);
 
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -72,18 +44,14 @@ export function SignUpForm({
     }
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/patient/dashboard`,
           data: {
             full_name: fullName,
-            role: userRole,
-            ...(userRole === "doctor" && {
-              hospital_id: selectedHospital,
-              specialization: specialization || "General",
-            }),
+            role: "patient",
           },
         },
       });
@@ -135,78 +103,6 @@ export function SignUpForm({
                   className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="userRole" className="text-[#0c1b1d] dark:text-white font-semibold">I am a</Label>
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="userRole"
-                      value="patient"
-                      checked={userRole === "patient"}
-                      onChange={(e) => setUserRole(e.target.value as UserRole)}
-                      className="w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <span className="text-[#0c1b1d] dark:text-white font-medium">Patient</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="userRole"
-                      value="hospital"
-                      checked={userRole === "hospital"}
-                      onChange={(e) => setUserRole(e.target.value as UserRole)}
-                      className="w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <span className="text-[#0c1b1d] dark:text-white font-medium">Hospital</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="userRole"
-                      value="doctor"
-                      checked={userRole === "doctor"}
-                      onChange={(e) => setUserRole(e.target.value as UserRole)}
-                      className="w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <span className="text-[#0c1b1d] dark:text-white font-medium">Doctor</span>
-                  </label>
-                </div>
-              </div>
-
-              {userRole === "doctor" && (
-                <>
-                  <div className="grid gap-2">
-                    <Label htmlFor="hospital" className="text-[#0c1b1d] dark:text-white font-semibold">Select Hospital</Label>
-                    <Select value={selectedHospital} onValueChange={setSelectedHospital}>
-                      <SelectTrigger className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-[#0c1b1d] dark:text-white">
-                        <SelectValue placeholder="Select a hospital" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {hospitals.map((hospital) => (
-                          <SelectItem key={hospital.id} value={hospital.id}>
-                            {hospital.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="specialization" className="text-[#0c1b1d] dark:text-white font-semibold">
-                      Specialization
-                    </Label>
-                    <Input
-                      id="specialization"
-                      type="text"
-                      placeholder="e.g. Cardiology"
-                      value={specialization}
-                      onChange={(e) => setSpecialization(e.target.value)}
-                      className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
-                    />
-                  </div>
-                </>
-              )}
-
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password" className="text-[#0c1b1d] dark:text-white font-semibold">Password</Label>
