@@ -67,6 +67,10 @@ export default {
         display: ["var(--font-manrope)", "sans-serif"],
         num: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
+      boxShadow: {
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+      },
       borderRadius: {
         lg: "1rem",
         md: "calc(1rem - 2px)",

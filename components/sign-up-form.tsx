@@ -71,16 +71,16 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6 font-display", className)} {...props}>
-      <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+      <Card className="border-0 shadow-lg bg-white">
         <CardHeader className="text-center pb-4">
-          <CardTitle className="text-3xl font-bold text-[#0c1b1d] dark:text-white">Create Account</CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-400">Sign up to get started with medcAIr</CardDescription>
+          <CardTitle className="text-3xl font-bold text-ink">Create Account</CardTitle>
+          <CardDescription className="text-ink-muted">Sign up to get started with medcAIr</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="fullName" className="text-[#0c1b1d] dark:text-white font-semibold">Full Name</Label>
+                <Label htmlFor="fullName" className="text-ink font-semibold">Full Name</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -92,7 +92,7 @@ export function SignUpForm({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email" className="text-[#0c1b1d] dark:text-white font-semibold">Email</Label>
+                <Label htmlFor="email" className="text-ink font-semibold">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -105,7 +105,7 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password" className="text-[#0c1b1d] dark:text-white font-semibold">Password</Label>
+                  <Label htmlFor="password" className="text-ink font-semibold">Password</Label>
                 </div>
                 <Input
                   id="password"
@@ -118,7 +118,7 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="repeat-password" className="text-[#0c1b1d] dark:text-white font-semibold">Repeat Password</Label>
+                  <Label htmlFor="repeat-password" className="text-ink font-semibold">Repeat Password</Label>
                 </div>
                 <Input
                   id="repeat-password"
@@ -139,7 +139,7 @@ export function SignUpForm({
               </Button>
             </div>
             <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Already have an account? </span>
+              <span className="text-ink-muted">Already have an account? </span>
               <Link href="/auth/login" className="text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline">
                 Login
               </Link>

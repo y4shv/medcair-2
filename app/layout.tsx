@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -35,18 +34,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* The site is light only. Tells browsers not to darken form controls and scrollbars. */}
+        <meta name="color-scheme" content="light" />
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className={`${manrope.className} ${manrope.variable} ${inter.variable} antialiased font-display`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster position="top-right" richColors />
-        </ThemeProvider>
+        {children}
+        <Toaster position="top-right" theme="light" richColors />
       </body>
     </html>
   );

@@ -20,26 +20,30 @@ export default function PatientDashboard() {
 
   return (
     <>
-      <main className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 pb-16 pt-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-[32px] font-extrabold leading-tight tracking-tight">{data.patient.name}</h1>
-            <p className="text-ink-muted">
-              {data.patient.age} years · {data.patient.conditions.join(", ")}
-            </p>
+      {/* Soft tint-to-mist band behind the name and the section chips. */}
+      <div className="bg-gradient-to-b from-tint to-mist">
+        <div className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 pb-8 pt-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h1 className="text-[32px] font-extrabold leading-tight tracking-tight">{data.patient.name}</h1>
+              <p className="text-ink-muted">
+                {data.patient.age} years · {data.patient.conditions.join(", ")}
+              </p>
+            </div>
+            <Btn
+              variant="outline"
+              onClick={() => {
+                reset();
+                toast.success("Demo data reset");
+              }}
+            >
+              Reset demo data
+            </Btn>
           </div>
-          <Btn
-            variant="outline"
-            onClick={() => {
-              reset();
-              toast.success("Demo data reset");
-            }}
-          >
-            Reset demo data
-          </Btn>
+          <SectionNav />
         </div>
-        <SectionNav />
-
+      </div>
+      <main className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 pb-16 pt-6">
         <div className="flex flex-wrap items-start gap-6">
           <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-6">
             <ReminderBanner appointments={data.appointments} />

@@ -48,10 +48,10 @@ export function LoginForm({
 
   return (
     <div className={cn("flex flex-col gap-6 font-display", className)} {...props}>
-      <Card className="border-0 shadow-lg bg-white dark:bg-gray-800">
+      <Card className="border-0 shadow-lg bg-white">
         <CardHeader className="text-center pb-4">
-          <CardTitle className="text-3xl font-bold text-[#0c1b1d] dark:text-white">Welcome Back</CardTitle>
-          <CardDescription className="text-gray-600 dark:text-gray-400">
+          <CardTitle className="text-3xl font-bold text-ink">Welcome Back</CardTitle>
+          <CardDescription className="text-ink-muted">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
@@ -59,7 +59,7 @@ export function LoginForm({
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email" className="text-[#0c1b1d] dark:text-white font-semibold">Email</Label>
+                <Label htmlFor="email" className="text-ink font-semibold">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -72,7 +72,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password" className="text-[#0c1b1d] dark:text-white font-semibold">Password</Label>
+                  <Label htmlFor="password" className="text-ink font-semibold">Password</Label>
                   <Link
                     href="/auth/forgot-password"
                     className="ml-auto inline-block text-sm text-primary hover:text-primary/80 underline-offset-4 hover:underline font-medium"
@@ -99,7 +99,7 @@ export function LoginForm({
               </Button>
             </div>
             <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Don&apos;t have an account? </span>
+              <span className="text-ink-muted">Don&apos;t have an account? </span>
               <Link
                 href="/auth/sign-up"
                 className="text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline"

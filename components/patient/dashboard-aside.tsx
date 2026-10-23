@@ -14,8 +14,8 @@ export function DashboardAside({ appointments }: { appointments: Appointment[] }
   const next = nextAppointment(appointments);
 
   return (
-    <aside className="flex min-w-0 flex-[1_1_280px] flex-col gap-5">
-      <div className="flex flex-col gap-2.5 rounded-xl bg-tint p-6">
+    <aside className="flex min-w-0 flex-[1_1_280px] flex-col gap-5 max-lg:order-first">
+      <div className="flex flex-col gap-2.5 rounded-xl bg-tint p-6 shadow-card">
         <p className="flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.06em] text-care-deep">
           <Bell className="size-5" strokeWidth={2.2} aria-hidden />
           Next appointment
