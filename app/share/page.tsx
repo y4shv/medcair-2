@@ -42,7 +42,7 @@ export default function SharePage() {
         <p className="font-semibold">Shared by the patient. View only.</p>
         <button
           onClick={() => window.print()}
-          className="min-h-11 rounded-lg bg-green-700 px-4 py-2 font-bold text-white hover:bg-green-800"
+          className="min-h-11 rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700"
         >
           Print
         </button>

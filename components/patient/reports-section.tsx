@@ -35,7 +35,7 @@ export function ReportsSection({ data }: { data: HealthData }) {
                   href={r.documentUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 font-semibold text-green-800 underline"
+                  className="mt-2 inline-flex items-center gap-1 font-semibold text-indigo-700 underline"
                 >
                   Open the original report <ExternalLink className="size-4" aria-hidden />
                 </a>

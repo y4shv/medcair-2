@@ -79,7 +79,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
         type="checkbox"
         checked={opts[key]}
         onChange={(e) => setOpts({ ...opts, [key]: e.target.checked })}
-        className="size-6 accent-green-700"
+        className="size-6 accent-indigo-600"
       />
       {label}
     </label>

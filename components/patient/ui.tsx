@@ -26,7 +26,7 @@ export function Section({
 }
 
 export const inputClass =
-  "w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2.5 text-lg text-gray-900 focus:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-700/30";
+  "w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2.5 text-lg text-gray-900 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30";
 
 export function Field({
   label,
@@ -57,7 +57,7 @@ export function Btn({ variant = "primary", className, ...props }: BtnProps) {
       {...props}
       className={cn(
         "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-base font-bold disabled:opacity-50",
-        variant === "primary" && "bg-green-700 text-white hover:bg-green-800",
+        variant === "primary" && "bg-indigo-600 text-white hover:bg-indigo-700",
         variant === "outline" &&
           "border-2 border-gray-400 bg-white text-gray-900 hover:bg-gray-100",
         variant === "danger" &&

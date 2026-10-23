@@ -28,7 +28,7 @@ export function PatientNav() {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white print:hidden">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-green-700 text-white">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
             <Activity className="size-5" />
           </span>
           medcAIr
@@ -41,7 +41,7 @@ export function PatientNav() {
               className={cn(
                 "rounded-lg px-3 py-2 text-base font-semibold",
                 pathname === l.href
-                  ? "bg-green-100 text-green-900"
+                  ? "bg-indigo-100 text-indigo-900"
                   : "text-gray-800 hover:bg-gray-100",
               )}
             >
