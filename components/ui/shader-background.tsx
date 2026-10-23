@@ -221,9 +221,11 @@ const ShaderBackground = () => {
             gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            animationFrameId = requestAnimationFrame(render);
+            // Respect prefers-reduced-motion: draw one still frame instead of animating.
+            if (!reduceMotion) animationFrameId = requestAnimationFrame(render);
         };
 
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         render();
 
         return () => {
