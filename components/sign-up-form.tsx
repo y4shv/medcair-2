@@ -88,7 +88,7 @@ export function SignUpForm({
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
+                  className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
               <div className="grid gap-2">
@@ -100,7 +100,7 @@ export function SignUpForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
+                  className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
               <div className="grid gap-2">
@@ -113,7 +113,7 @@ export function SignUpForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
+                  className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
               <div className="grid gap-2">
@@ -126,7 +126,7 @@ export function SignUpForm({
                   required
                   value={repeatPassword}
                   onChange={(e) => setRepeatPassword(e.target.value)}
-                  className="border-2 border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20 text-[#0c1b1d] dark:text-white dark:bg-gray-900"
+                  className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
               {error && <p className="text-sm text-red-600 font-medium">{error}</p>}

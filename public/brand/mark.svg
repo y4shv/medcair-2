@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="medcAIr mark">
+  <rect width="120" height="120" rx="28" fill="#0B6E8F"/>
+  <path d="M82.3 39.9 A30 30 0 1 0 82.3 80.1" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+  <path d="M41 60 H50 L55.5 46 L63.5 73 L68.5 60 H88" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="99" cy="60" r="6.5" fill="#3CCFB0"/>
+</svg>

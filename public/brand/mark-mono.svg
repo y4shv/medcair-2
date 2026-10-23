@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="medcAIr mark, one colour">
+  <g fill="none" stroke="#0F2A3D" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M82.3 39.9 A30 30 0 1 0 82.3 80.1" stroke-width="9"/>
+    <path d="M41 60 H50 L55.5 46 L63.5 73 L68.5 60 H88" stroke-width="6"/>
+  </g>
+  <circle cx="99" cy="60" r="6.5" fill="#0F2A3D"/>
+</svg>
