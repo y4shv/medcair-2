@@ -72,6 +72,9 @@ export default function Home() {
             <span className="text-xl font-extrabold tracking-tight">medcAIr</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/patient/dashboard" className="text-sm font-semibold text-gray-200 hover:text-white">
+              My dashboard
+            </Link>
             <Link href="/auth/login" className="text-sm font-semibold text-gray-200 hover:text-white">
               Log in
             </Link>
@@ -108,6 +111,12 @@ export default function Home() {
                   className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:from-blue-500 hover:to-indigo-500"
                 >
                   Get started
+                </Link>
+                <Link
+                  href="/patient/dashboard"
+                  className="rounded-xl border border-white/30 bg-white/5 px-8 py-4 text-sm font-bold backdrop-blur hover:bg-white/10"
+                >
+                  Open my dashboard
                 </Link>
                 <Link
                   href="/auth/login"
