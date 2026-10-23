@@ -2,82 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* Ramain.ai inspired color scheme - solid colors */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+/* Design tokens: single source of truth. Tailwind reads these in tailwind.config.ts. */
+:root {
+  --ink: #0f2a3d;
+  --care: #0b6e8f;
+  --care-deep: #07506b;
+  --mint: #3ccfb0; /* decorative highlight only, never the only carrier of meaning */
+  --mist: #f4f8fa;
+  --surface: #ffffff;
+  --tint: #e3f2f7;
+  --ink-muted: #4a6272;
+  --border-soft: #d5e3ea;
+  --border-control: #6c8798;
 
-    /* Primary: Indigo */
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
+  --status-ok: #14663d;
+  --status-ok-bg: #e6f5ec;
+  --status-watch: #8a4b08;
+  --status-watch-bg: #fff1db;
+  --status-critical: #a3201a;
+  --status-critical-bg: #fde8e6;
+  --status-info: #1b4f9c;
+  --status-info-bg: #e6eefa;
 
-    /* Secondary: Light grey */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+  --range-band: #2e8b57;
+  --range-track: #dce9ef;
 
-    /* Muted: Light grey */
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-
-    /* Accent: Green */
-    --accent: 142 76% 36%;
-    --accent-foreground: 0 0% 100%;
-
-    /* Destructive: Red */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* Borders and inputs */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 142 76% 36%;
-
-    /* Chart colors */
-    --chart-1: 142 76% 36%;
-    /* Green */
-    --chart-2: 199 89% 48%;
-    /* Cyan */
-    --chart-3: 262 83% 58%;
-    /* Purple */
-    --chart-4: 330 81% 60%;
-    /* Pink */
-    --chart-5: 38 92% 50%;
-    /* Amber */
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 243 75% 66%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 142 76% 46%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 142 76% 46%;
-    --chart-1: 142 76% 46%;
-    --chart-2: 199 89% 58%;
-    --chart-3: 262 83% 68%;
-    --chart-4: 330 81% 70%;
-    --chart-5: 38 92% 60%;
-  }
+  /* shadcn variables (auth pages and ui/*) mapped onto the tokens above */
+  --background: 200 37% 97%;
+  --foreground: 205 61% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 205 61% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 205 61% 15%;
+  --primary: 195 86% 30%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 195 56% 93%;
+  --secondary-foreground: 196 88% 22%;
+  --muted: 195 56% 93%;
+  --muted-foreground: 204 21% 37%;
+  --accent: 195 56% 93%;
+  --accent-foreground: 196 88% 22%;
+  --destructive: 3 72% 37%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 200 33% 88%;
+  --input: 203 18% 51%;
+  --ring: 195 86% 30%;
+  --radius: 1rem;
 }
 
 @layer base {
@@ -86,9 +56,39 @@
   }
 
   body {
-    @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-white;
+    font-size: 17px;
+    background: var(--mist);
+    color: var(--ink);
+    line-height: 1.5;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Visible focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--care);
+    outline-offset: 2px;
+  }
+
+  /* On the dark landing surfaces the care colour is too dark to see, so use mint. */
+  .on-dark :focus-visible {
+    outline-color: var(--mint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+.num {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 @layer utilities {
