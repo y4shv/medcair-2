@@ -16,17 +16,17 @@ export function Section({
   return (
     <section
       id={id}
-      className="scroll-mt-32 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+      className="scroll-mt-32 rounded-2xl border border-white/10 bg-black/40 p-4 shadow-lg backdrop-blur-xl sm:p-6"
     >
       <h2 className="text-2xl font-bold">{title}</h2>
-      {intro && <p className="mt-1 text-gray-700">{intro}</p>}
+      {intro && <p className="mt-1 text-gray-300">{intro}</p>}
       <div className="mt-4">{children}</div>
     </section>
   );
 }
 
 export const inputClass =
-  "w-full rounded-lg border-2 border-gray-400 bg-white px-3 py-2.5 text-lg text-gray-900 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30";
+  "w-full rounded-lg border-2 border-white/20 bg-white/10 px-3 py-2.5 text-lg text-white placeholder:text-gray-400 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30";
 
 export function Field({
   label,
@@ -57,11 +57,11 @@ export function Btn({ variant = "primary", className, ...props }: BtnProps) {
       {...props}
       className={cn(
         "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-base font-bold disabled:opacity-50",
-        variant === "primary" && "bg-indigo-600 text-white hover:bg-indigo-700",
+        variant === "primary" && "bg-indigo-600 text-white hover:bg-indigo-500",
         variant === "outline" &&
-          "border-2 border-gray-400 bg-white text-gray-900 hover:bg-gray-100",
+          "border-2 border-white/20 bg-white/5 text-white hover:bg-white/10",
         variant === "danger" &&
-          "border-2 border-red-700 bg-white text-red-800 hover:bg-red-50",
+          "border-2 border-red-400 bg-white/5 text-red-300 hover:bg-red-500/10",
         className,
       )}
     />
@@ -79,9 +79,9 @@ export function Pill({
     <span
       className={cn(
         "inline-block rounded-full px-2.5 py-0.5 text-sm font-semibold",
-        tone === "gray" && "bg-gray-200 text-gray-900",
-        tone === "amber" && "bg-amber-100 text-amber-900",
-        tone === "green" && "bg-green-100 text-green-900",
+        tone === "gray" && "bg-white/15 text-white",
+        tone === "amber" && "bg-amber-500/20 text-amber-200",
+        tone === "green" && "bg-green-500/20 text-green-200",
       )}
     >
       {children}

@@ -91,7 +91,7 @@ function UploadForm({ update }: { update: Update }) {
       <Btn type="submit" className="sm:w-fit">
         Add file
       </Btn>
-      <p className="text-base text-gray-700">
+      <p className="text-base text-gray-300">
         The file is kept on this device only. The app does not read the numbers inside it yet.
       </p>
     </form>
@@ -202,15 +202,15 @@ function AbdmDemo({ data, update }: { data: HealthData; update: Update }) {
   };
 
   return (
-    <div className="rounded-xl border-2 border-amber-600 bg-amber-50 p-4 sm:max-w-xl">
-      <h3 className="text-xl font-bold text-amber-950">Fetch from ABHA/ABDM (SIMULATED)</h3>
-      <p className="mt-1 text-amber-950">
+    <div className="rounded-xl border-2 border-amber-400/60 bg-amber-500/10 p-4 sm:max-w-xl">
+      <h3 className="text-xl font-bold text-amber-100">Fetch from ABHA/ABDM (SIMULATED)</h3>
+      <p className="mt-1 text-amber-100">
         This is a demo button. It does not connect to ABHA or ABDM. It adds fake sample records so
         you can see how fetched records would look.
       </p>
       <Btn
         variant="outline"
-        className="mt-3 border-amber-700"
+        className="mt-3 border-amber-400/60"
         onClick={fetchSimulated}
         disabled={data.abdmFetched}
       >

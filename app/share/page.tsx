@@ -37,12 +37,12 @@ export default function SharePage() {
 
   const { p } = state;
   return (
-    <main className="mx-auto max-w-3xl bg-white p-6 text-lg text-gray-900">
+    <main className="mx-auto max-w-3xl p-6 text-lg text-white">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 print:hidden">
         <p className="font-semibold">Shared by the patient. View only.</p>
         <button
           onClick={() => window.print()}
-          className="min-h-11 rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700"
+          className="min-h-11 rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-500"
         >
           Print
         </button>
@@ -55,10 +55,10 @@ export default function SharePage() {
       {p.patient.conditions.length > 0 && (
         <p>Known conditions: {p.patient.conditions.join(", ")}</p>
       )}
-      <p className="mt-1 text-base text-gray-700">
+      <p className="mt-1 text-base text-gray-300">
         Made on {formatDateTime(p.generatedAt)}. Link works until {formatDateTime(p.expiresAt)}.
       </p>
-      <p className="mt-3 rounded-lg border-2 border-gray-900 bg-gray-100 p-3 font-bold">
+      <p className="mt-3 rounded-lg border-2 border-white/60 bg-white/10 p-3 font-bold">
         This is a summary made by the patient from their own records. It is not medical advice.
       </p>
 
@@ -67,13 +67,13 @@ export default function SharePage() {
           <h2 className="text-2xl font-bold">Medicines</h2>
           <ul className="mt-2 space-y-2">
             {p.medicines.map((m) => (
-              <li key={m.name} className="border-b border-gray-300 pb-2">
+              <li key={m.name} className="border-b border-white/20 pb-2">
                 <span className="font-bold">
                   {m.name} {m.dose}
                 </span>
                 : {m.howToTake}
                 <br />
-                <span className="text-base text-gray-700">Prescribed by: {m.prescriber}</span>
+                <span className="text-base text-gray-300">Prescribed by: {m.prescriber}</span>
               </li>
             ))}
           </ul>
@@ -88,7 +88,7 @@ export default function SharePage() {
               <p className="font-bold">
                 {formatDate(l.date)}: {l.title}
               </p>
-              <p className="text-base text-gray-700">{l.source}</p>
+              <p className="text-base text-gray-300">{l.source}</p>
               <ul className="mt-1 list-disc pl-6">
                 {l.results.map((r) => (
                   <li key={r.name}>

@@ -46,7 +46,7 @@ export function CaregiversSection({ data, update }: { data: HealthData; update: 
     >
       <ul className="space-y-3">
         {data.caregivers.map((c) => (
-          <li key={c.id} className="rounded-xl border border-gray-300 p-4">
+          <li key={c.id} className="rounded-xl border border-white/20 p-4">
             <p className="text-lg font-bold">{c.name}</p>
             <p>{c.contact}</p>
             <p>Added: {formatDate(c.invitedOn)}</p>
@@ -82,7 +82,7 @@ export function CaregiversSection({ data, update }: { data: HealthData; update: 
           Invite (view only)
         </Btn>
       </form>
-      <p className="mt-3 text-base text-gray-700">
+      <p className="mt-3 text-base text-gray-300">
         Note: in this prototype no message is sent. This only saves the invite in your list.
       </p>
     </Section>

@@ -25,7 +25,7 @@ export function PatientNav() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white print:hidden">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/40 backdrop-blur-md print:hidden">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
           <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
@@ -41,8 +41,8 @@ export function PatientNav() {
               className={cn(
                 "rounded-lg px-3 py-2 text-base font-semibold",
                 pathname === l.href
-                  ? "bg-indigo-100 text-indigo-900"
-                  : "text-gray-800 hover:bg-gray-100",
+                  ? "bg-indigo-500/30 text-indigo-100"
+                  : "text-gray-100 hover:bg-white/10",
               )}
             >
               {l.label}
@@ -51,7 +51,7 @@ export function PatientNav() {
         </nav>
         <button
           onClick={logout}
-          className="rounded-lg border-2 border-gray-300 px-3 py-2 text-base font-semibold hover:bg-gray-100"
+          className="rounded-lg border-2 border-white/20 px-3 py-2 text-base font-semibold hover:bg-white/10"
         >
           Log out
         </button>

@@ -77,18 +77,18 @@ export function HealthTimeline({ data }: { data: HealthData }) {
                 <span className="absolute -left-[29px] top-1 flex size-6 items-center justify-center rounded-full bg-indigo-600 text-white">
                   <Icon className="size-3.5" aria-hidden />
                 </span>
-                <p className="font-semibold text-gray-700">
+                <p className="font-semibold text-gray-300">
                   {formatDate(e.date)} · {e.kindLabel}
                 </p>
                 <p className="text-xl font-bold">{e.title}</p>
                 <p>From: {e.source}</p>
-                {e.details && <p className="text-gray-800">{e.details}</p>}
+                {e.details && <p className="text-gray-100">{e.details}</p>}
                 {e.fileUrl && (
                   <a
                     href={e.fileUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="font-semibold text-indigo-700 underline"
+                    className="font-semibold text-indigo-300 underline"
                   >
                     Open file{e.fileName ? `: ${e.fileName}` : ""}
                   </a>

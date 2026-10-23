@@ -20,12 +20,12 @@ export function ReminderBanner({
   return (
     <div
       role="status"
-      className="rounded-2xl border-2 border-amber-600 bg-amber-50 p-4"
+      className="rounded-2xl border-2 border-amber-400/60 bg-amber-500/10 p-4"
     >
-      <p className="flex items-center gap-2 text-xl font-bold text-amber-950">
+      <p className="flex items-center gap-2 text-xl font-bold text-amber-100">
         <Bell className="size-6" aria-hidden /> Reminder
       </p>
-      <ul className="mt-2 space-y-1 text-lg text-amber-950">
+      <ul className="mt-2 space-y-1 text-lg text-amber-100">
         {due.map((a) => (
           <li key={a.id}>
             You see {a.doctorName} on {formatDate(a.date)}
@@ -36,7 +36,7 @@ export function ReminderBanner({
       {link && (
         <Link
           href="/patient/appointments"
-          className="mt-2 inline-block font-bold text-amber-950 underline"
+          className="mt-2 inline-block font-bold text-amber-100 underline"
         >
           See my appointments
         </Link>

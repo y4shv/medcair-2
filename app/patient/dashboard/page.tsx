@@ -31,7 +31,7 @@ export default function PatientDashboard() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold">{data.patient.name}</h1>
-            <p className="text-gray-800">
+            <p className="text-gray-100">
               {data.patient.age} years · {data.patient.conditions.join(", ")}
             </p>
           </div>
@@ -50,14 +50,14 @@ export default function PatientDashboard() {
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="whitespace-nowrap rounded-full border-2 border-gray-400 bg-white px-4 py-1.5 text-base font-semibold hover:bg-gray-100"
+              className="whitespace-nowrap rounded-full border-2 border-white/20 bg-white/5 px-4 py-1.5 text-base font-semibold hover:bg-white/10"
             >
               {s.label}
             </a>
           ))}
         </nav>
 
-        <p className="rounded-lg border-2 border-amber-600 bg-amber-50 p-3 text-base font-semibold text-amber-950">
+        <p className="rounded-lg border-2 border-amber-400/60 bg-amber-500/10 p-3 text-base font-semibold text-amber-100">
           Student prototype. All records on this page are fake demo data.
         </p>
 

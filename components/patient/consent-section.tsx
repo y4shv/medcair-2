@@ -97,7 +97,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
           const expired = c.until < today;
           const active = !c.revoked && !expired;
           return (
-            <li key={c.id} className="rounded-xl border border-gray-300 p-4">
+            <li key={c.id} className="rounded-xl border border-white/20 p-4">
               <p className="text-lg font-bold">{c.grantee}</p>
               <p>Can see: {c.scope}</p>
               <p>Until: {formatDate(c.until)}</p>
@@ -116,7 +116,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
       </ul>
 
       <h3 className="mt-8 text-xl font-bold">Share with someone</h3>
-      <p className="text-gray-700">
+      <p className="text-gray-300">
         Make a link that stops working on its own, or open a page you can print.
       </p>
       <fieldset className="mt-3">
@@ -154,7 +154,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
               const expired = new Date(l.expiresAt).getTime() < Date.now();
               const live = !l.revoked && !expired;
               return (
-                <li key={l.id} className="rounded-xl border border-gray-300 p-4">
+                <li key={l.id} className="rounded-xl border border-white/20 p-4">
                   <p>Made: {formatDateTime(l.createdAt)}</p>
                   <p>Ends: {formatDateTime(l.expiresAt)}</p>
                   {live ? (
@@ -178,7 +178,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
               );
             })}
           </ul>
-          <p className="mt-3 text-base text-gray-700">
+          <p className="mt-3 text-base text-gray-300">
             Note: in this prototype the link holds your summary inside it. Removing a link only
             removes it from this list. A link you already sent will still open until it ends.
           </p>
