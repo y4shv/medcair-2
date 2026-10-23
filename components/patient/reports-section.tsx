@@ -1,9 +1,65 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
-import type { HealthData } from "@/lib/health/types";
+import { ArrowDown, ArrowUp, Equal, ExternalLink } from "lucide-react";
+import type { HealthData, LabResult } from "@/lib/health/types";
 import { formatDate } from "@/lib/health/format";
-import { Pill as Tag, Section } from "./ui";
+import { analyseResult } from "@/lib/health/range";
+import { Pill, Section } from "./ui";
+import { RangeBar } from "./range-bar";
+
+const trendIcon = { lower: ArrowDown, higher: ArrowUp, same: Equal } as const;
+
+function ResultRow({ res }: { res: LabResult }) {
+  const view = analyseResult(res);
+  const Trend = view?.trend ? trendIcon[view.trend.dir] : null;
+
+  return (
+    <div className="flex flex-wrap gap-x-8 gap-y-5 border-t border-line-soft py-6">
+      <div className="min-w-0 flex-[1_1_220px]">
+        <h4 className="text-[19px] font-extrabold">{res.name}</h4>
+        <p className="text-base text-ink-muted">{res.measures}</p>
+      </div>
+      <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-x-3.5 gap-y-2">
+          <p className="num text-[34px] font-bold leading-[1.1] tracking-tight">
+            {res.value}{" "}
+            <span className="text-lg font-semibold text-ink-muted">{res.unit}</span>
+          </p>
+          {view && (
+            <Pill tone={view.status.kind === "within" ? "ok" : "watch"}>{view.statusText}</Pill>
+          )}
+        </div>
+        {view ? (
+          <>
+            {view.trend && Trend ? (
+              <p className="flex items-center gap-1.5 text-[15px] font-bold text-care-deep">
+                <Trend className="size-4 shrink-0" strokeWidth={2.6} aria-hidden />
+                <span className="num">{view.trend.text}</span>
+              </p>
+            ) : (
+              <p className="text-[15px] font-bold text-ink-muted">No earlier value to compare.</p>
+            )}
+            <RangeBar view={view} printed={res.referenceRange} />
+          </>
+        ) : (
+          <>
+            <p className="text-base text-ink-muted">
+              Range printed on the report:{" "}
+              <span className="font-bold text-ink">{res.referenceRange}</span>. This range could not be
+              drawn as a bar.
+            </p>
+            <p className="text-base text-ink-muted">
+              Last time:{" "}
+              {res.previousValue
+                ? `${res.previousValue} ${res.unit}${res.previousDate ? ` (${formatDate(res.previousDate)})` : ""}`
+                : "No earlier value"}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function ReportsSection({ data }: { data: HealthData }) {
   const reports = [...data.labReports].sort((a, b) => b.date.localeCompare(a.date));
@@ -12,22 +68,22 @@ export function ReportsSection({ data }: { data: HealthData }) {
     <Section id="reports" title="My reports in plain words">
       <p
         role="note"
-        className="mb-4 rounded-lg border-2 border-white/60 bg-white/10 p-3 font-bold"
+        className="mb-2 flex items-start gap-2 rounded-xl bg-status-info-bg p-3 text-[15px] font-bold text-status-info lg:hidden"
       >
         This is a summary of your report, not medical advice.
       </p>
       {reports.length === 0 ? (
         <p>No lab reports yet.</p>
       ) : (
-        <ul className="space-y-5">
+        <div className="space-y-8">
           {reports.map((r) => (
-            <li key={r.id} className="rounded-xl border border-white/20 p-4">
-              <p className="font-semibold text-gray-300">{formatDate(r.date)}</p>
-              <p className="text-xl font-bold">{r.title}</p>
-              <p>From: {r.source}</p>
+            <article key={r.id} aria-label={r.title}>
+              <p className="text-base text-ink-muted">
+                {formatDate(r.date)} · {r.title} · From: {r.source}
+              </p>
               {r.simulated && (
-                <p className="mt-1">
-                  <Tag tone="amber">Simulated demo entry</Tag>
+                <p className="mt-2">
+                  <Pill tone="info">Simulated demo entry</Pill>
                 </p>
               )}
               {r.documentUrl ? (
@@ -35,49 +91,24 @@ export function ReportsSection({ data }: { data: HealthData }) {
                   href={r.documentUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 font-semibold text-indigo-300 underline"
+                  className="mt-1.5 inline-flex min-h-11 items-center gap-1 text-base font-bold text-care underline hover:text-care-deep"
                 >
                   Open the original report <ExternalLink className="size-4" aria-hidden />
                 </a>
               ) : (
-                <p className="mt-2 text-gray-300">No original document on file.</p>
+                <p className="mt-1.5 text-base text-ink-muted">No original document on file.</p>
               )}
-              <div className="mt-3 space-y-3">
+              <div className="mt-4">
                 {r.results.map((res) => (
-                  <div key={res.name} className="rounded-lg bg-white/5 p-3">
-                    <p className="text-lg font-bold">{res.name}</p>
-                    <p className="text-gray-100">What it measures: {res.measures}</p>
-                    <dl className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-3">
-                      <div>
-                        <dt className="text-sm font-semibold text-gray-300">Your value</dt>
-                        <dd className="text-lg font-bold">
-                          {res.value} {res.unit}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-semibold text-gray-300">Last time</dt>
-                        <dd className="text-lg">
-                          {res.previousValue
-                            ? `${res.previousValue} ${res.unit}${res.previousDate ? ` (${formatDate(res.previousDate)})` : ""}`
-                            : "No earlier value"}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-sm font-semibold text-gray-300">
-                          Range printed on the report
-                        </dt>
-                        <dd className="text-lg">{res.referenceRange}</dd>
-                      </div>
-                    </dl>
-                  </div>
+                  <ResultRow key={res.name} res={res} />
                 ))}
               </div>
-              <p className="mt-3 text-base text-gray-300">
-                Talk to your doctor about what these numbers mean for you.
-              </p>
-            </li>
+            </article>
           ))}
-        </ul>
+          <p className="border-t border-line-soft pt-4 text-base text-ink-muted">
+            Talk to your doctor about what these numbers mean for you.
+          </p>
+        </div>
       )}
     </Section>
   );

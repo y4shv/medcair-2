@@ -46,17 +46,17 @@ export function CaregiversSection({ data, update }: { data: HealthData; update: 
     >
       <ul className="space-y-3">
         {data.caregivers.map((c) => (
-          <li key={c.id} className="rounded-xl border border-white/20 p-4">
+          <li key={c.id} className="rounded-xl border border-line-soft p-4">
             <p className="text-lg font-bold">{c.name}</p>
             <p>{c.contact}</p>
             <p>Added: {formatDate(c.invitedOn)}</p>
             <div className="mt-2 flex flex-wrap items-center gap-3">
-              <Pill tone="green">View only</Pill>
+              <Pill tone="info">View only</Pill>
               {c.revoked ? (
-                <Pill tone="gray">Access removed</Pill>
+                <Pill tone="neutral">Access removed</Pill>
               ) : (
                 <>
-                  <Pill tone={c.status === "active" ? "green" : "amber"}>
+                  <Pill tone={c.status === "active" ? "ok" : "watch"}>
                     {c.status === "active" ? "Has access" : "Invited"}
                   </Pill>
                   <Btn variant="danger" onClick={() => revoke(c.id)} aria-label={`Remove access for ${c.name}`}>
@@ -82,7 +82,7 @@ export function CaregiversSection({ data, update }: { data: HealthData; update: 
           Invite (view only)
         </Btn>
       </form>
-      <p className="mt-3 text-base text-gray-300">
+      <p className="mt-3 text-base text-ink-muted">
         Note: in this prototype no message is sent. This only saves the invite in your list.
       </p>
     </Section>

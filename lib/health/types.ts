@@ -34,6 +34,13 @@ export interface LabResult {
   previousDate?: string;
   /** Reference range exactly as printed on the report. */
   referenceRange: string;
+  /**
+   * Numbers parsed from referenceRange (see range.ts), kept next to the printed string.
+   * "4.0 - 5.6 %" gives low 4 and high 5.6. "Below 100" gives high 100 only.
+   * "Above 40" gives low 40 only. Missing when the string could not be read.
+   */
+  rangeLow?: number;
+  rangeHigh?: number;
 }
 
 export interface LabReport {

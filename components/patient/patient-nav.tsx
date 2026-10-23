@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -25,33 +25,34 @@ export function PatientNav() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-black/40 backdrop-blur-md print:hidden">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-xl font-extrabold">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-indigo-600 text-white">
-            <Activity className="size-5" />
-          </span>
-          medcAIr
+    <header className="sticky top-0 z-40 border-b border-line-soft bg-surface print:hidden">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-7 gap-y-3 px-6 py-3">
+        <Link href="/" className="flex items-center" aria-label="medcAIr home">
+          <Logo />
         </Link>
-        <nav className="flex flex-1 flex-wrap gap-2">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={cn(
-                "rounded-lg px-3 py-2 text-base font-semibold",
-                pathname === l.href
-                  ? "bg-indigo-500/30 text-indigo-100"
-                  : "text-gray-100 hover:bg-white/10",
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
+        <nav aria-label="Main" className="order-last flex w-full flex-wrap gap-2 sm:order-none sm:w-auto sm:flex-1">
+          {links.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-4 text-base",
+                  active
+                    ? "bg-tint font-extrabold text-care-deep"
+                    : "font-bold text-ink hover:bg-tint",
+                )}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
         </nav>
         <button
           onClick={logout}
-          className="rounded-lg border-2 border-white/20 px-3 py-2 text-base font-semibold hover:bg-white/10"
+          className="ml-auto min-h-11 rounded-xl border-[1.5px] border-line-control bg-surface px-4 text-base font-bold text-ink hover:bg-tint"
         >
           Log out
         </button>

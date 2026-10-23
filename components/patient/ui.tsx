@@ -1,3 +1,4 @@
+import { AlertTriangle, CheckCircle2, Info, OctagonAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Small shared building blocks so every section looks the same.
@@ -16,17 +17,17 @@ export function Section({
   return (
     <section
       id={id}
-      className="scroll-mt-32 rounded-2xl border border-white/10 bg-black/40 p-4 shadow-lg backdrop-blur-xl sm:p-6"
+      className="scroll-mt-24 rounded-xl border border-line-soft bg-surface p-5 sm:p-7"
     >
-      <h2 className="text-2xl font-bold">{title}</h2>
-      {intro && <p className="mt-1 text-gray-300">{intro}</p>}
+      <h2 className="text-2xl font-extrabold">{title}</h2>
+      {intro && <p className="mt-1 text-ink-muted">{intro}</p>}
       <div className="mt-4">{children}</div>
     </section>
   );
 }
 
 export const inputClass =
-  "w-full rounded-lg border-2 border-white/20 bg-white/10 px-3 py-2.5 text-lg text-white placeholder:text-gray-400 focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/30";
+  "w-full min-h-11 rounded-xl border-[1.5px] border-line-control bg-surface px-3 py-2.5 text-base text-ink placeholder:text-ink-muted focus:border-care focus:outline-none focus:ring-2 focus:ring-care/30";
 
 export function Field({
   label,
@@ -39,7 +40,7 @@ export function Field({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label htmlFor={htmlFor} className="font-semibold">
+      <label htmlFor={htmlFor} className="text-base font-bold">
         {label}
       </label>
       {children}
@@ -56,34 +57,52 @@ export function Btn({ variant = "primary", className, ...props }: BtnProps) {
     <button
       {...props}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-base font-bold disabled:opacity-50",
-        variant === "primary" && "bg-indigo-600 text-white hover:bg-indigo-500",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2 text-base font-bold disabled:opacity-50",
+        variant === "primary" && "bg-care text-white hover:bg-care-deep",
         variant === "outline" &&
-          "border-2 border-white/20 bg-white/5 text-white hover:bg-white/10",
+          "border-[1.5px] border-line-control bg-surface text-ink hover:bg-tint",
         variant === "danger" &&
-          "border-2 border-red-400 bg-white/5 text-red-300 hover:bg-red-500/10",
+          "border-[1.5px] border-line-control bg-surface text-status-critical hover:bg-status-critical-bg",
         className,
       )}
     />
   );
 }
 
+export type Tone = "neutral" | "ok" | "watch" | "critical" | "info";
+
+const toneClass: Record<Tone, string> = {
+  neutral: "bg-tint text-care-deep",
+  ok: "bg-status-ok-bg text-status-ok",
+  watch: "bg-status-watch-bg text-status-watch",
+  critical: "bg-status-critical-bg text-status-critical",
+  info: "bg-status-info-bg text-status-info",
+};
+
+const toneIcon = {
+  ok: CheckCircle2,
+  watch: AlertTriangle,
+  critical: OctagonAlert,
+  info: Info,
+} as const;
+
+/** Status chip. Always icon plus words, never colour alone. Neutral has no icon. */
 export function Pill({
   children,
-  tone = "gray",
+  tone = "neutral",
 }: {
   children: React.ReactNode;
-  tone?: "gray" | "amber" | "green";
+  tone?: Tone;
 }) {
+  const Icon = tone === "neutral" ? null : toneIcon[tone];
   return (
     <span
       className={cn(
-        "inline-block rounded-full px-2.5 py-0.5 text-sm font-semibold",
-        tone === "gray" && "bg-white/15 text-white",
-        tone === "amber" && "bg-amber-500/20 text-amber-200",
-        tone === "green" && "bg-green-500/20 text-green-200",
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-extrabold",
+        toneClass[tone],
       )}
     >
+      {Icon && <Icon className="size-4" strokeWidth={2.6} aria-hidden />}
       {children}
     </span>
   );

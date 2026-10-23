@@ -61,8 +61,8 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl space-y-6 px-4 py-6">
-      <h1 className="text-3xl font-bold">My appointments</h1>
+    <main className="mx-auto max-w-3xl space-y-6 px-6 pb-16 pt-8">
+      <h1 className="text-[32px] font-extrabold leading-tight tracking-tight">My appointments</h1>
       <ReminderBanner appointments={data.appointments} link={false} />
 
       <Section
@@ -176,7 +176,7 @@ function AppointmentCard({
   onRemove: (id: string) => void;
 }) {
   return (
-    <li className="rounded-xl border border-white/20 p-4">
+    <li className="rounded-xl border border-line-soft p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="text-xl font-bold">{a.doctorName}</p>
@@ -189,9 +189,9 @@ function AppointmentCard({
             <MapPin className="size-5" aria-hidden />
             {a.place}
           </p>
-          {a.notes && <p className="mt-2 text-gray-100">Notes: {a.notes}</p>}
+          {a.notes && <p className="mt-2 text-ink">Notes: {a.notes}</p>}
           <p className="mt-2">
-            <Pill tone={a.reminder === "none" ? "gray" : "green"}>
+            <Pill tone={a.reminder === "none" ? "neutral" : "ok"}>
               Reminder: {reminderLabels[a.reminder]}
             </Pill>
           </p>

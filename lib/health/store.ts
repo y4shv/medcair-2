@@ -5,6 +5,7 @@
 import { useCallback, useSyncExternalStore } from "react";
 import type { HealthData } from "./types";
 import { buildDemoData } from "./demo-data";
+import { withParsedRanges } from "./range";
 
 const KEY = "medcair.health.v1";
 
@@ -16,7 +17,8 @@ function read(): HealthData {
     const raw = window.localStorage.getItem(KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as HealthData;
-      if (parsed?.version === 1) return parsed;
+      if (parsed?.version === 1)
+        return { ...parsed, labReports: withParsedRanges(parsed.labReports ?? []) };
     }
   } catch {
     // Fall through to demo data.

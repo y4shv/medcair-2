@@ -79,7 +79,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
         type="checkbox"
         checked={opts[key]}
         onChange={(e) => setOpts({ ...opts, [key]: e.target.checked })}
-        className="size-6 accent-indigo-600"
+        className="size-6 accent-care"
       />
       {label}
     </label>
@@ -97,7 +97,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
           const expired = c.until < today;
           const active = !c.revoked && !expired;
           return (
-            <li key={c.id} className="rounded-xl border border-white/20 p-4">
+            <li key={c.id} className="rounded-xl border border-line-soft p-4">
               <p className="text-lg font-bold">{c.grantee}</p>
               <p>Can see: {c.scope}</p>
               <p>Until: {formatDate(c.until)}</p>
@@ -107,7 +107,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
                     Remove access
                   </Btn>
                 ) : (
-                  <Pill tone="gray">{c.revoked ? "Access removed" : "Access ended"}</Pill>
+                  <Pill tone="neutral">{c.revoked ? "Access removed" : "Access ended"}</Pill>
                 )}
               </div>
             </li>
@@ -116,7 +116,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
       </ul>
 
       <h3 className="mt-8 text-xl font-bold">Share with someone</h3>
-      <p className="text-gray-300">
+      <p className="text-ink-muted">
         Make a link that stops working on its own, or open a page you can print.
       </p>
       <fieldset className="mt-3">
@@ -154,7 +154,7 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
               const expired = new Date(l.expiresAt).getTime() < Date.now();
               const live = !l.revoked && !expired;
               return (
-                <li key={l.id} className="rounded-xl border border-white/20 p-4">
+                <li key={l.id} className="rounded-xl border border-line-soft p-4">
                   <p>Made: {formatDateTime(l.createdAt)}</p>
                   <p>Ends: {formatDateTime(l.expiresAt)}</p>
                   {live ? (
@@ -171,14 +171,14 @@ export function ConsentSection({ data, update }: { data: HealthData; update: Upd
                     </div>
                   ) : (
                     <p className="mt-2">
-                      <Pill tone="gray">{l.revoked ? "Removed" : "Ended"}</Pill>
+                      <Pill tone="neutral">{l.revoked ? "Removed" : "Ended"}</Pill>
                     </p>
                   )}
                 </li>
               );
             })}
           </ul>
-          <p className="mt-3 text-base text-gray-300">
+          <p className="mt-3 text-base text-ink-muted">
             Note: in this prototype the link holds your summary inside it. Removing a link only
             removes it from this list. A link you already sent will still open until it ends.
           </p>

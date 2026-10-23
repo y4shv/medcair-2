@@ -6,6 +6,7 @@ import type {
   Medicine,
 } from "./types";
 import { daysFromToday } from "./format";
+import { withParsedRanges } from "./range";
 
 const SUNRISE = "Sunrise Diagnostics (demo lab)";
 const DIABETES = "Dr. Anita Rao, City Diabetes Centre";
@@ -279,7 +280,7 @@ export function buildDemoData(): HealthData {
       conditions: ["Type 2 diabetes", "High blood pressure"],
     },
     records: buildRecords(),
-    labReports: buildDemoLabReports(),
+    labReports: withParsedRanges(buildDemoLabReports()),
     medicines: buildMedicines(),
     appointments: [
       {
@@ -371,5 +372,5 @@ export function buildSimulatedAbdmRecords() {
       ],
     },
   ];
-  return { records, labReports };
+  return { records, labReports: withParsedRanges(labReports) };
 }

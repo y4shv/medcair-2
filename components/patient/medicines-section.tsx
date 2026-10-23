@@ -20,16 +20,16 @@ export function MedicinesSection({ data }: { data: HealthData }) {
             const { daysLeft, refillBy } = estimateRefill(m.remaining, m.perDay);
             const low = daysLeft <= 7;
             return (
-              <li key={m.id} className="rounded-xl border border-white/20 p-4">
+              <li key={m.id} className="rounded-xl border border-line-soft p-4">
                 <p className="text-xl font-bold">
                   {m.name} <span className="font-semibold">{m.dose}</span>
                 </p>
                 <p>{m.howToTake}</p>
-                <p className="mt-1 text-gray-100">
+                <p className="mt-1 text-ink">
                   Prescribed by: {m.prescriber}
                 </p>
                 {m.forCondition && (
-                  <p className="text-gray-100">For: {m.forCondition}</p>
+                  <p className="text-ink">For: {m.forCondition}</p>
                 )}
                 <p className="mt-2 flex flex-wrap items-center gap-2">
                   <Clock className="size-5" aria-hidden />
@@ -42,11 +42,11 @@ export function MedicinesSection({ data }: { data: HealthData }) {
                 </p>
                 <p>
                   Estimated refill by: {formatDate(refillBy)}{" "}
-                  {low && <Tag tone="amber">Refill soon</Tag>}
+                  {low && <Tag tone="watch">Refill soon</Tag>}
                 </p>
                 {m.simulated && (
                   <p className="mt-1">
-                    <Tag tone="amber">Simulated demo entry</Tag>
+                    <Tag tone="info">Simulated demo entry</Tag>
                   </p>
                 )}
               </li>
@@ -54,7 +54,7 @@ export function MedicinesSection({ data }: { data: HealthData }) {
           })}
         </ul>
       )}
-      <p className="mt-4 text-base text-gray-300">
+      <p className="mt-4 text-base text-ink-muted">
         Reminder times are shown here only. This app does not send alerts yet.
         The refill date is an estimate from the count and doses per day.
       </p>
