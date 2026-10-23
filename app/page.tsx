@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { PulseIcon } from "@/components/brand/pulse-icon";
+import { FooterWave, HeroWave } from "@/components/landing/waves";
+import { FlowBackground } from "@/components/brand/flow-background";
 import { HeroBackground } from "@/components/landing/hero-background";
 import { RangeBar } from "@/components/patient/range-bar";
 import { Pill as StatusPill } from "@/components/patient/ui";
@@ -118,10 +120,11 @@ export default function Home() {
       </header>
 
       <main>
-      <section className="on-dark relative min-h-[760px] overflow-hidden bg-[linear-gradient(135deg,#0F2A3D_0%,#0B2233_55%,#0A3A4A_100%)] pt-[65px] text-white max-[900px]:min-h-0">
+      <section className="on-dark relative bg-[linear-gradient(135deg,#0F2A3D_0%,#0B2233_55%,#0A3A4A_100%)] pt-[65px] text-white">
         <HeroBackground />
+        <HeroWave />
 
-        <div className="relative z-[2] mx-auto grid max-w-[1200px] items-center gap-10 px-6 pb-24 pt-[72px] min-[901px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] max-[900px]:pb-36 max-[900px]:pt-12">
+        <div className="relative z-[2] mx-auto grid max-w-[1200px] items-center gap-10 px-6 pb-28 pt-[72px] min-[901px]:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] max-[900px]:pb-32 max-[900px]:pt-12">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-extrabold uppercase tracking-[0.12em] text-mint-pale">
               <PulseIcon />
@@ -165,7 +168,7 @@ export default function Home() {
           </div>
 
           {/* Static samples with made-up data. Not interactive. */}
-          <div className="relative min-h-[420px] max-[900px]:min-h-0">
+          <div className="relative min-h-[420px] min-[901px]:translate-y-[var(--card-drop)] max-[900px]:min-h-0">
             <div
               role="group"
               aria-label="Sample lab result. Example only, not a real person's data."
@@ -211,8 +214,17 @@ export default function Home() {
         </div>
       </section>
 
-        <section className="mx-auto max-w-[1120px] px-6 py-16">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
+        {/* Everything below the hero sits on a tint-to-mist gradient that picks up the wave fill. */}
+        <div className="relative bg-mist bg-[linear-gradient(180deg,#E3F2F7,#F4F8FA)] bg-[length:100%_280px] bg-no-repeat">
+          {/* One very faint still layer of the hero's motif. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[380px] overflow-hidden opacity-[0.08] [mask-image:linear-gradient(180deg,black_30%,transparent)]"
+          >
+            <FlowBackground theme="light" animate={false} />
+          </div>
+        <section className="relative mx-auto max-w-[1120px] px-6 pb-16 pt-16 min-[901px]:pt-[130px]">
+          <div className="relative mx-auto mb-12 max-w-2xl text-center">
             <p className="mb-3 inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.12em] text-care-deep">
               <PulseIcon />
               Features
@@ -222,7 +234,7 @@ export default function Home() {
               Everything you need to manage your health in one secure place.
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="relative grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => {
               const Icon = f.icon;
               return (
@@ -248,35 +260,45 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="on-dark relative overflow-hidden bg-[linear-gradient(135deg,#0F2A3D_0%,#0B2233_55%,#0A3A4A_100%)] text-white">
-          <Image
-            src="/brand/mark.svg"
-            alt=""
-            aria-hidden="true"
-            width={420}
-            height={420}
-            className="pointer-events-none absolute -right-16 top-1/2 size-[420px] -translate-y-1/2 opacity-[0.08] max-[900px]:-right-24 max-[900px]:size-[300px]"
-          />
-          <div className="relative mx-auto max-w-[1120px] px-6 py-16 sm:py-20">
-            <h2 className="max-w-[560px] text-4xl font-extrabold leading-[1.1] tracking-[-0.01em]">
-              You choose who sees it
-            </h2>
-            <ul className="mt-6 space-y-3 text-[17px] font-semibold">
-              {[
-                "You decide who can see your records",
-                "Share with a link that ends on its own",
-                "Automatic health history timeline",
-              ].map((t) => (
-                <li key={t} className="flex items-center gap-3">
-                  <CheckCircle className="size-5 shrink-0 text-mint" aria-hidden /> {t}
-                </li>
-              ))}
-            </ul>
-            <Link href="/auth/sign-up" className={`${cta} mt-8 bg-mint text-ink hover:bg-mint-pale`}>
-              Get Started Free
-            </Link>
-          </div>
-        </section>
+        <div className="mx-auto my-16 max-w-[1200px] px-6">
+          <section className="on-dark relative overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#0F2A3D_0%,#0B2233_55%,#0A3A4A_100%)] text-white">
+            {/* Still flow lines, kept off the text by the veil. No animation. */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-50">
+              <FlowBackground theme="ink" animate={false} />
+            </div>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(12,32,47,.92)_0%,rgba(12,32,47,.92)_38%,rgba(12,32,47,0)_66%)] max-[900px]:bg-[linear-gradient(180deg,rgba(12,32,47,.92)_0%,rgba(12,32,47,.92)_45%,rgba(12,32,47,0)_80%)]"
+            />
+            <Image
+              src="/brand/mark.svg"
+              alt=""
+              aria-hidden="true"
+              width={420}
+              height={420}
+              className="pointer-events-none absolute -right-12 top-1/2 size-[380px] -translate-y-1/2 opacity-[0.08] max-[900px]:-right-24 max-[900px]:size-[280px]"
+            />
+            <div className="relative px-7 py-14 sm:px-14 sm:py-16">
+              <h2 className="max-w-[560px] text-4xl font-extrabold leading-[1.1] tracking-[-0.01em]">
+                You choose who sees it
+              </h2>
+              <ul className="mt-6 max-w-[420px] space-y-3 text-[17px] font-semibold">
+                {[
+                  "You decide who can see your records",
+                  "Share with a link that ends on its own",
+                  "Automatic health history timeline",
+                ].map((t) => (
+                  <li key={t} className="flex items-center gap-3">
+                    <CheckCircle className="size-5 shrink-0 text-mint" aria-hidden /> {t}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/auth/sign-up" className={`${cta} mt-8 bg-mint text-ink hover:bg-mint-pale`}>
+                Get Started Free
+              </Link>
+            </div>
+          </section>
+        </div>
 
         <section className="mx-auto max-w-[1120px] px-6 py-20">
           <div className="grid items-center gap-10 rounded-xl border border-line-soft bg-surface p-7 shadow-card sm:p-12 lg:grid-cols-2">
@@ -325,10 +347,12 @@ export default function Home() {
             </figure>
           </div>
         </section>
+        </div>
       </main>
 
-      <footer className="on-dark bg-ink">
-        <div className="mx-auto flex max-w-[1120px] flex-col gap-4 px-6 py-10">
+      <footer className="on-dark relative bg-[linear-gradient(135deg,#0F2A3D_0%,#0B2233_55%,#0A3A4A_100%)]">
+        <FooterWave />
+        <div className="relative mx-auto flex max-w-[1120px] flex-col gap-4 px-6 pb-10 pt-24 min-[901px]:pt-28">
           <Logo onDark />
           <p className="max-w-3xl text-sm text-ink-soft">
             medcAIr is a student prototype (IIT Delhi, Strategic Design Management). It uses fake
