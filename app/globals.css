@@ -75,6 +75,11 @@
     outline-offset: 2px;
   }
 
+  /* Dark surfaces: care is too dark to see there, so the ring turns mint. */
+  .on-dark :focus-visible {
+    outline-color: var(--mint);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

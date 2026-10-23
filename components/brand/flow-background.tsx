@@ -50,11 +50,14 @@ const LINES: Line[] = Array.from({ length: N }, (_, i) => ({
 export function FlowBackground({
   theme = "light",
   paused = false,
+  animate = true,
   className,
 }: {
   theme?: Theme;
   /** Stops the animation and leaves one still frame. */
   paused?: boolean;
+  /** false: draw one still frame and never start a loop (used inside the app). */
+  animate?: boolean;
   className?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -148,7 +151,7 @@ export function FlowBackground({
       ctx.globalCompositeOperation = "source-over";
     };
 
-    const shouldRun = () => !reduce && !pausedRef.current && visible && !document.hidden;
+    const shouldRun = () => animate && !reduce && !pausedRef.current && visible && !document.hidden;
 
     const frame = (ts: number) => {
       if (!shouldRun()) {
@@ -219,7 +222,7 @@ export function FlowBackground({
       document.removeEventListener("visibilitychange", sync);
       kick.current = () => {};
     };
-  }, [theme]);
+  }, [theme, animate]);
 
   return (
     <canvas
