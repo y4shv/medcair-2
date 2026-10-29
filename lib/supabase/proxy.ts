@@ -53,7 +53,13 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/login") &&
     // Share links are opened by people the patient chooses, without an account.
     !request.nextUrl.pathname.startsWith("/share") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !request.nextUrl.pathname.startsWith("/auth") &&
+    !request.nextUrl.pathname.startsWith("/demo") &&
+    // Demo visitors (see app/demo/route.ts) browse the fake data without an account.
+    !(
+      request.cookies.get("medcair_demo")?.value === "1" &&
+      request.nextUrl.pathname.startsWith("/patient")
+    )
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();

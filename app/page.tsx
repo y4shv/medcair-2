@@ -103,8 +103,8 @@ export default function Home() {
           </Link>
           <span className="flex-1" />
           <nav aria-label="Main" className="flex items-center gap-1">
-            <Link href="/patient/dashboard" className={`${navLink} max-[900px]:hidden`}>
-              My dashboard
+            <Link href="/demo" className={`${navLink} max-[900px]:hidden`}>
+              Try the demo
             </Link>
             <Link href="/auth/login" className={`${navLink} max-[900px]:hidden`}>
               Log in
@@ -142,10 +142,10 @@ export default function Home() {
                 Get started
               </Link>
               <Link
-                href="/patient/dashboard"
+                href="/demo"
                 className={`${cta} border-[1.5px] border-white bg-transparent text-white hover:bg-white/10`}
               >
-                Open my dashboard
+                Try the demo
               </Link>
               <Link
                 href="/auth/login"
@@ -249,7 +249,7 @@ export default function Home() {
                   <h3 className="mb-2 text-xl font-extrabold">{f.title}</h3>
                   <p className="mb-5 text-base text-ink-muted">{f.text}</p>
                   <Link
-                    href="/patient/dashboard"
+                    href="/demo"
                     className="mt-auto inline-flex min-h-11 items-center gap-1.5 text-base font-bold text-care-deep underline underline-offset-4 hover:text-care"
                   >
                     {f.cta} <ArrowRight className="size-4" aria-hidden />
@@ -311,10 +311,10 @@ export default function Home() {
                 Your Medical Records, Secure and Portable.
               </h2>
               <Link
-                href="/patient/dashboard"
+                href="/demo"
                 className="inline-flex min-h-11 items-center gap-1.5 text-base font-bold text-care-deep underline underline-offset-4 hover:text-care"
               >
-                Open my dashboard <ArrowRight className="size-4" aria-hidden />
+                Try the demo <ArrowRight className="size-4" aria-hidden />
               </Link>
             </div>
             <figure aria-labelledby="records-caption" className="rounded-xl bg-mist p-6">

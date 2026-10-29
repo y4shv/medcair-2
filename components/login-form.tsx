@@ -110,6 +110,14 @@ export function LoginForm({
                 Sign up
               </Link>
             </div>
+            <div className="mt-3 text-center text-sm">
+              <Link
+                href="/demo"
+                className="text-ink-muted hover:text-ink font-semibold underline underline-offset-4"
+              >
+                Or try the demo with fake data, no account needed
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>
