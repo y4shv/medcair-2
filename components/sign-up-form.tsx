@@ -45,7 +45,7 @@ export function SignUpForm({
     }
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -61,7 +61,9 @@ export function SignUpForm({
       // Profile will be automatically created by database trigger
       // The trigger reads role and full_name from raw_user_meta_data
 
-      router.push("/auth/sign-up-success");
+      // With email confirmation off Supabase returns a session straight away.
+      router.push(signUpData.session ? "/patient/dashboard" : "/auth/sign-up-success");
+      router.refresh();
 
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
