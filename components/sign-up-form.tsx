@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GoogleButton, OrDivider } from "@/components/google-button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -77,6 +78,8 @@ export function SignUpForm({
           <CardDescription className="text-ink-muted">Sign up to get started with medcAIr</CardDescription>
         </CardHeader>
         <CardContent>
+          <GoogleButton />
+          <OrDivider />
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
