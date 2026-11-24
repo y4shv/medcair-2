@@ -118,7 +118,7 @@ export function SignUpForm({
                   className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
-              {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
+              {error && <p className="text-sm text-status-critical font-semibold">{error}</p>}
               <Button
                 type="submit"
                 className="w-full bg-primary text-white hover:bg-primary/90 font-semibold py-6 text-lg shadow-lg shadow-primary/20"
@@ -129,14 +129,14 @@ export function SignUpForm({
             </div>
             <div className="mt-6 text-center text-sm">
               <span className="text-ink-muted">Already have an account? </span>
-              <Link href="/auth/login" className="text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline">
+              <Link href="/auth/login" className="inline-flex min-h-11 items-center px-1 text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline">
                 Login
               </Link>
             </div>
             <div className="mt-3 text-center text-sm">
               <Link
                 href="/demo"
-                className="text-ink-muted hover:text-ink font-semibold underline underline-offset-4"
+                className="inline-flex min-h-11 items-center text-ink-muted hover:text-ink font-semibold underline underline-offset-4"
               >
                 Or try the demo with fake data, no account needed
               </Link>

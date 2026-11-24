@@ -22,7 +22,7 @@ export function OpenFileLink({
 
   if (!path && url) {
     return (
-      <a href={url} target="_blank" rel="noreferrer" className={className}>
+      <a href={url} {...(url.startsWith("/") ? {} : { target: "_blank", rel: "noreferrer" })} className={className}>
         {label}
         <ExternalLink className="size-4" aria-hidden />
       </a>

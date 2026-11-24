@@ -1,14 +1,15 @@
 import type { HealthData } from "./types";
 import { buildTimelineRows } from "./summary";
 
-// A share link carries a small summary inside the URL (after the #), so it
-// works without a server. TODO: store shares on the server so they can be
-// revoked for real and so the link is shorter.
+// Signed-in patients get a short link (/share?id=...) backed by a Firestore copy that can be
+// revoked for real. Demo visitors get a long link that carries the summary after the #.
 
 export interface SharePayload {
   v: 1;
   generatedAt: string;
   expiresAt: string;
+  /** Who the link was made for. */
+  forName?: string;
   patient: { name: string; age: number; conditions: string[] };
   medicines?: { name: string; dose: string; howToTake: string; prescriber: string }[];
   labs?: {
@@ -25,6 +26,7 @@ export interface ShareOptions {
   labs: boolean;
   history: boolean;
   hours: number;
+  forName?: string;
 }
 
 export function buildPayload(data: HealthData, opts: ShareOptions): SharePayload {
@@ -33,6 +35,7 @@ export function buildPayload(data: HealthData, opts: ShareOptions): SharePayload
     v: 1,
     generatedAt: now.toISOString(),
     expiresAt: new Date(now.getTime() + opts.hours * 3600000).toISOString(),
+    forName: opts.forName?.trim() || undefined,
     patient: {
       name: data.patient.name,
       age: data.patient.age,

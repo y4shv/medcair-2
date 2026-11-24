@@ -12,6 +12,7 @@ import { AiSummarySection } from "@/components/patient/ai-summary-section";
 import { AddRecordsSection } from "@/components/patient/add-records-section";
 import { Loading } from "@/components/patient/ui";
 import { FlowBackground } from "@/components/brand/flow-background";
+import { BackToTop } from "@/components/patient/back-to-top";
 import { SectionNav } from "@/components/patient/section-nav";
 import { DashboardAside } from "@/components/patient/dashboard-aside";
 
@@ -56,9 +57,8 @@ export default function PatientDashboard() {
           )}
         </div>
       </div>
-      <div className="mx-auto max-w-[1120px] px-6 pb-2 pt-6">
-        <SectionNav />
-      </div>
+      <SectionNav />
+      <BackToTop />
       <main className="mx-auto flex max-w-[1120px] flex-col gap-6 px-6 pb-16 pt-4">
         <div className="flex flex-wrap items-start gap-6">
           <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-6">
@@ -67,7 +67,7 @@ export default function PatientDashboard() {
             <HealthTimeline data={data} update={update} />
             <MedicinesSection data={data} update={update} />
             <ReportsSection data={data} />
-            <ConsentSection data={data} update={update} />
+            <ConsentSection data={data} update={update} mode={mode} />
             <CaregiversSection data={data} update={update} />
             <AddRecordsSection data={data} update={update} mode={mode} />
           </div>

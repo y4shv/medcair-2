@@ -100,6 +100,10 @@ export interface Consent {
 
 export interface ShareLink {
   id: string;
+  /** Who the link is for, e.g. "Dr. Rao". */
+  forName?: string;
+  /** Id of the stored copy (signed-in accounts). Missing for old long links. */
+  shortId?: string;
   createdAt: string;
   expiresAt: string;
   url: string;
@@ -134,4 +138,6 @@ export interface HealthData {
   caregivers: Caregiver[];
   abdmFetched: boolean;
   aiSummary?: AiSummary;
+  /** Doses ticked off today: { "2026-11-24": ["medId@08:00"] }. Only today is kept. */
+  dosesTaken?: Record<string, string[]>;
 }

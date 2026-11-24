@@ -17,7 +17,7 @@ export function Section({
   return (
     <section
       id={id}
-      className="scroll-mt-24 rounded-xl border border-line-soft bg-surface p-5 shadow-card sm:p-7"
+      className="scroll-mt-40 rounded-xl border border-line-soft bg-surface p-5 shadow-card sm:p-7"
     >
       <h2 className="text-2xl font-extrabold">{title}</h2>
       {intro && <p className="mt-1 text-ink-muted">{intro}</p>}

@@ -106,6 +106,14 @@ export function HealthTimeline({ data, update }: { data: HealthData; update: Upd
                 <p className="text-xl font-bold">{e.title}</p>
                 <p>From: {e.source}</p>
                 {e.details && <p className="text-ink">{e.details}</p>}
+                {e.type === "lab" && (
+                  <a
+                    href={`#report-${e.id}`}
+                    className="mr-4 inline-flex min-h-11 items-center gap-1 font-semibold text-care-deep underline"
+                  >
+                    See the results
+                  </a>
+                )}
                 {(e.filePath || e.fileUrl) && (
                   <OpenFileLink
                     path={e.filePath}

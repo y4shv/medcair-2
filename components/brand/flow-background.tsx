@@ -135,6 +135,7 @@ export function FlowBackground({
       }
       for (const p of pulses) {
         const y = yAt(LINES[p.line], p.x);
+        if (!Number.isFinite(p.x) || !Number.isFinite(y)) continue;
         const g = ctx.createRadialGradient(p.x, y, 0, p.x, y, 16);
         if (theme === "light") {
           g.addColorStop(0, "rgba(60,207,176,0.95)");

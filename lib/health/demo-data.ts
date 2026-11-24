@@ -264,6 +264,7 @@ function buildMedicines(): Medicine[] {
       dose: "10 mg",
       howToTake: "1 tablet, at night",
       prescriber: FAMILY,
+      forCondition: "High cholesterol",
       reminderTimes: ["21:00"],
       remaining: 14,
       perDay: 1,

@@ -44,6 +44,9 @@ export function PatientNav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
+                onClick={() => {
+                  if (active) window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 className={cn(
                   "inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-4 text-base",
                   active

@@ -75,7 +75,7 @@ export function LoginForm({
                   <Label htmlFor="password" className="text-ink font-semibold">Password</Label>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm text-primary hover:text-primary/80 underline-offset-4 hover:underline font-medium"
+                    className="ml-auto inline-flex min-h-11 items-center text-sm text-primary hover:text-primary/80 underline-offset-4 hover:underline font-medium"
                   >
                     Forgot password?
                   </Link>
@@ -89,7 +89,7 @@ export function LoginForm({
                   className="border-2 border-line-control focus:border-primary focus:ring-primary/20 text-ink bg-surface"
                 />
               </div>
-              {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
+              {error && <p className="text-sm text-status-critical font-semibold">{error}</p>}
               <Button
                 type="submit"
                 className="w-full bg-primary text-white hover:bg-primary/90 font-semibold py-6 text-lg shadow-lg shadow-primary/20"
@@ -102,7 +102,7 @@ export function LoginForm({
               <span className="text-ink-muted">Don&apos;t have an account? </span>
               <Link
                 href="/auth/sign-up"
-                className="text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline"
+                className="inline-flex min-h-11 items-center px-1 text-primary hover:text-primary/80 font-semibold underline-offset-4 hover:underline"
               >
                 Sign up
               </Link>
@@ -110,7 +110,7 @@ export function LoginForm({
             <div className="mt-3 text-center text-sm">
               <Link
                 href="/demo"
-                className="text-ink-muted hover:text-ink font-semibold underline underline-offset-4"
+                className="inline-flex min-h-11 items-center text-ink-muted hover:text-ink font-semibold underline underline-offset-4"
               >
                 Or try the demo with fake data, no account needed
               </Link>

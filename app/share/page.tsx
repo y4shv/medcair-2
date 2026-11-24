@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
 import { decodePayload, type SharePayload } from "@/lib/health/share";
+import { firebaseDb, hasFirebase } from "@/lib/firebase/client";
 import { formatDate, formatDateTime } from "@/lib/health/format";
 
 // Read-only summary a patient chooses to show someone. Opens without login.
-// The data is inside the link (after the #), nothing is loaded from a server.
+// Short links (?id=...) load a stored copy from Firestore that the patient can stop.
+// Old long links carry the summary after the # instead.
 
 export default function SharePage() {
   const [state, setState] = useState<
@@ -13,10 +16,23 @@ export default function SharePage() {
   >({ kind: "loading" });
 
   useEffect(() => {
-    const p = decodePayload(window.location.hash);
-    if (!p) setState({ kind: "bad" });
-    else if (new Date(p.expiresAt).getTime() < Date.now()) setState({ kind: "expired" });
-    else setState({ kind: "ok", p });
+    (async () => {
+      const id = new URLSearchParams(window.location.search).get("id");
+      let p: SharePayload | null = null;
+      if (id && hasFirebase) {
+        try {
+          const snap = await getDoc(doc(firebaseDb(), "shares", id));
+          if (snap.exists()) p = JSON.parse(String(snap.data().payload)) as SharePayload;
+        } catch {
+          // Stopped, missing or blocked by the rules: shown as a link that does not work.
+        }
+      } else if (!id) {
+        p = decodePayload(window.location.hash);
+      }
+      if (!p) setState({ kind: "bad" });
+      else if (new Date(p.expiresAt).getTime() < Date.now()) setState({ kind: "expired" });
+      else setState({ kind: "ok", p });
+    })();
   }, []);
 
   if (state.kind === "loading") return <main className="p-6 text-lg">Loading...</main>;
@@ -24,7 +40,7 @@ export default function SharePage() {
     return (
       <main className="mx-auto max-w-2xl p-6 text-lg">
         <h1 className="text-2xl font-bold">This link does not work</h1>
-        <p className="mt-2">The link may be cut short or wrong. Ask the patient for a new one.</p>
+        <p className="mt-2">The link may be wrong, or the patient may have stopped it. Ask the patient for a new one.</p>
       </main>
     );
   if (state.kind === "expired")
@@ -48,7 +64,7 @@ export default function SharePage() {
         </button>
       </div>
 
-      <h1 className="text-3xl font-bold">Health summary</h1>
+      <h1 className="text-3xl font-bold">Health summary{p.forName ? ` for ${p.forName}` : ""}</h1>
       <p className="mt-1">
         {p.patient.name}{p.patient.age ? `, ${p.patient.age} years` : ""}
       </p>
@@ -83,7 +99,7 @@ export default function SharePage() {
       {p.labs && (
         <section className="mt-6">
           <h2 className="text-2xl font-bold">Lab reports</h2>
-          {p.labs.map((l, i) => (
+          {[...p.labs].sort((a, b) => b.date.localeCompare(a.date)).map((l, i) => (
             <div key={i} className="mt-3">
               <p className="font-bold">
                 {formatDate(l.date)}: {l.title}

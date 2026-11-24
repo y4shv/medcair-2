@@ -66,7 +66,11 @@ export function ReportsSection({ data }: { data: HealthData }) {
   const reports = [...data.labReports].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
-    <Section id="reports" title="My reports in plain words">
+    <Section
+      id="reports"
+      title="My reports in plain words"
+      intro="The printed range is the range your lab printed on your report. We show where your number sits, and never say if it is good or bad."
+    >
       <p
         role="note"
         className="mb-2 flex items-start gap-2 rounded-xl bg-status-info-bg p-3 text-[15px] font-bold text-status-info lg:hidden"
@@ -78,7 +82,7 @@ export function ReportsSection({ data }: { data: HealthData }) {
       ) : (
         <div className="space-y-8">
           {reports.map((r) => (
-            <article key={r.id} aria-label={r.title}>
+            <article key={r.id} id={`report-${r.id}`} aria-label={r.title} className="scroll-mt-40">
               <p className="text-base text-ink-muted">
                 {formatDate(r.date)} · {r.title} · From: {r.source}
               </p>
@@ -90,8 +94,6 @@ export function ReportsSection({ data }: { data: HealthData }) {
               {r.documentUrl && !r.documentPath ? (
                 <a
                   href={r.documentUrl}
-                  target="_blank"
-                  rel="noreferrer"
                   className="mt-1.5 inline-flex min-h-11 items-center gap-1 text-base font-bold text-care underline hover:text-care-deep"
                 >
                   Open the original report <ExternalLink className="size-4" aria-hidden />

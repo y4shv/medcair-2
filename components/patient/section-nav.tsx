@@ -17,6 +17,18 @@ export const sections = [
 // Jump links to each section. The chip for the section on screen is filled.
 export function SectionNav() {
   const [active, setActive] = useState("");
+  const [top, setTop] = useState(0);
+
+  // Stay just under the page header, whatever height it has on this screen.
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (!header) return;
+    const set = () => setTop(header.getBoundingClientRect().height);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(header);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const els = sections
@@ -34,7 +46,11 @@ export function SectionNav() {
   }, []);
 
   return (
-    <nav aria-label="Sections" className="flex flex-wrap gap-2.5">
+    <div className="sticky z-30 bg-mist/95 backdrop-blur print:hidden" style={{ top }}>
+    <nav
+      aria-label="Sections"
+      className="mx-auto flex max-w-[1120px] gap-2.5 overflow-x-auto px-6 pb-3 pt-4 [scrollbar-width:none]"
+    >
       {sections.map((s) => {
         const on = active === s.id;
         return (
@@ -44,7 +60,7 @@ export function SectionNav() {
             onClick={() => setActive(s.id)}
             aria-current={on ? "true" : undefined}
             className={cn(
-              "inline-flex min-h-11 items-center rounded-full border-[1.5px] px-[18px] text-base",
+              "inline-flex min-h-11 shrink-0 items-center rounded-full border-[1.5px] px-[18px] text-base",
               on
                 ? "border-care bg-care font-extrabold text-white"
                 : "border-line-control bg-surface font-bold text-ink hover:bg-tint",
@@ -55,5 +71,6 @@ export function SectionNav() {
         );
       })}
     </nav>
+    </div>
   );
 }
