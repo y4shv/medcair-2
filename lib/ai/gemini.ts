@@ -1,7 +1,11 @@
 // Thin server-side wrapper around the Google Gemini API (free tier via Google AI Studio).
 // Needs GEMINI_API_KEY in the environment. Never import this from client code.
 
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+// Tried in order. Google retires and overloads free models often, so there is a fallback.
+export const GEMINI_MODELS = (process.env.GEMINI_MODEL || "gemini-3.8-flash,gemini-3-flash-preview")
+  .split(",")
+  .map((m) => m.trim())
+  .filter(Boolean);
 const url = (model: string) =>
   `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
@@ -23,24 +27,45 @@ export async function askAi(opts: {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new AiNotConfiguredError();
 
-  const res = await fetch(url(GEMINI_MODEL), {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: opts.system }] },
-      contents: [{ role: "user", parts: opts.parts }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        maxOutputTokens: opts.maxTokens ?? 4096,
-        temperature: 0.2,
-      },
-    }),
-  });
+  const send = (model: string) =>
+    fetch(url(model), {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": key },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: opts.system }] },
+        contents: [{ role: "user", parts: opts.parts }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          maxOutputTokens: opts.maxTokens ?? 4096,
+          temperature: 0.2,
+        },
+      }),
+      signal: AbortSignal.timeout(75_000),
+    });
 
+  let res: Response | null = null;
+  for (const model of GEMINI_MODELS) {
+    // 503 means "briefly overloaded": try again a couple of times, then move to the next model.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        res = await send(model);
+      } catch {
+        res = null; // timeout or network error
+      }
+      if (res && res.status !== 503) break;
+      await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
+    }
+    if (res && res.ok) break;
+    if (res && res.status === 429) break;
+    if (res) console.error("Gemini model failed", model, res.status);
+  }
+
+  if (!res) throw new Error("Could not reach the AI service. Please try again.");
   if (!res.ok) {
     const body = await res.text().catch(() => "");
     console.error("Gemini API error", res.status, body.slice(0, 500));
     if (res.status === 429) throw new Error("The free AI limit was reached. Please try again in a minute.");
+    if (res.status === 503) throw new Error("The AI is very busy right now. Please try again in a few minutes.");
     throw new Error(`The AI service returned an error (${res.status}).`);
   }
   const json = (await res.json()) as {
