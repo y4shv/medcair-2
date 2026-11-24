@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { verifyRequest } from "@/lib/firebase/verify";
 import { AiNotConfiguredError, askClaude, parseJsonObject, type ClaudeContent } from "@/lib/ai/claude";
 import { extractionSchema } from "@/lib/ai/extract-schema";
 
 export const maxDuration = 120;
 
-const BUCKET = "medical-documents";
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
 const SYSTEM = `You read medical documents (lab reports, prescriptions, doctor visit notes) for a patient app and return structured data.
@@ -31,9 +30,8 @@ JSON shape:
 "value" must be only the number as printed (no unit). "referenceRange" is exactly as printed, including the unit. "quantity" is the number of tablets/units prescribed if stated, else 0.`;
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) {
+  const user = await verifyRequest(request);
+  if (!user) {
     return NextResponse.json({ error: "Please sign in to read documents with the AI." }, { status: 401 });
   }
 
@@ -43,18 +41,28 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-  // Only the person's own folder (storage policies enforce this too).
-  if (!path.startsWith(`${auth.user.id}/`) || path.includes("..")) {
+  // Only the person's own folder (storage rules enforce this too).
+  if (!path.startsWith(`${user.uid}/`) || path.includes("..")) {
     return NextResponse.json({ error: "That file is not yours." }, { status: 403 });
   }
 
-  const { data: blob, error } = await supabase.storage.from(BUCKET).download(path);
-  if (error || !blob) {
+  // Download with the person's own token, so the storage rules decide what is readable.
+  const bucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  const dl = await fetch(
+    `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`,
+    { headers: { Authorization: `Firebase ${user.token}` } },
+  );
+  if (!dl.ok) {
     return NextResponse.json({ error: "Could not find the uploaded file." }, { status: 404 });
   }
-
-  const mime = blob.type || (path.toLowerCase().endsWith(".pdf") ? "application/pdf" : "");
-  const bytes = Buffer.from(await blob.arrayBuffer());
+  const bytes = Buffer.from(await dl.arrayBuffer());
+  const headerType = (dl.headers.get("content-type") ?? "").split(";")[0].trim();
+  const mime =
+    headerType && headerType !== "application/octet-stream"
+      ? headerType
+      : path.toLowerCase().endsWith(".pdf")
+        ? "application/pdf"
+        : "";
   const data = bytes.toString("base64");
 
   let fileBlock: ClaudeContent;

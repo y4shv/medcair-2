@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
-import { createClient } from "@/lib/supabase/client";
+import { signOut } from "firebase/auth";
+import { firebaseAuth, hasFirebase } from "@/lib/firebase/client";
 import { cn } from "@/lib/utils";
 import { clearStore, flushSave } from "@/lib/health/store";
 
@@ -19,9 +20,11 @@ export function PatientNav() {
   const logout = async () => {
     try {
       await flushSave();
-      await createClient().auth.signOut();
+      // Leave the demo too, so the login page is reachable again.
+      document.cookie = "medcair_demo=; path=/; max-age=0";
+      if (hasFirebase) await signOut(firebaseAuth());
     } catch {
-      // No Supabase set up (local demo). Just go to the login page.
+      // Not signed in (demo). Just go to the login page.
     }
     clearStore();
     router.push("/auth/login");

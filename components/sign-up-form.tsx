@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { authErrorMessage, firebaseAuth, hasFirebase } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,7 +35,6 @@ export function SignUpForm({
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
@@ -45,28 +45,12 @@ export function SignUpForm({
     }
 
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/patient/dashboard`,
-          data: {
-            full_name: fullName,
-            role: "patient",
-          },
-        },
-      });
-      if (signUpError) throw signUpError;
-
-      // Profile will be automatically created by database trigger
-      // The trigger reads role and full_name from raw_user_meta_data
-
-      // With email confirmation off Supabase returns a session straight away.
-      router.push(signUpData.session ? "/patient/dashboard" : "/auth/sign-up-success");
-      router.refresh();
-
+      if (!hasFirebase) throw new Error("Sign-up is not set up on this site yet.");
+      const cred = await createUserWithEmailAndPassword(firebaseAuth(), email, password);
+      await updateProfile(cred.user, { displayName: fullName.trim() });
+      router.push("/patient/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(authErrorMessage(error));
     } finally {
       setIsLoading(false);
     }

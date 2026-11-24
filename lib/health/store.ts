@@ -1,17 +1,18 @@
 "use client";
 
 // Health data store with two modes:
-//  - "cloud": a signed-in patient. Data lives in the Supabase `health_data` table
-//    (one JSON document per user, protected by Row Level Security).
-//  - "local": demo visitors (no account) and a missing Supabase setup. Fake demo
+//  - "cloud": a signed-in patient. Data lives in the Firestore `health_data/{uid}` document
+//    (one per user, protected by firestore.rules).
+//  - "local": demo visitors (no account) and a missing Firebase setup. Fake demo
 //    data lives in this browser's localStorage only.
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import type { HealthData } from "./types";
 import { buildDemoData } from "./demo-data";
 import { withParsedRanges } from "./range";
-import { createClient } from "@/lib/supabase/client";
-import { hasEnvVars } from "@/lib/utils";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import type { User } from "firebase/auth";
+import { firebaseAuth, firebaseDb, hasFirebase } from "@/lib/firebase/client";
 
 const KEY = "medcair.health.v1";
 
@@ -77,12 +78,16 @@ export function emptyHealthData(name: string): HealthData {
   };
 }
 
+// The whole record is stored as one JSON string in one document per user (Firestore
+// documents cannot hold undefined values and the shape changes often).
 async function saveCloud(data: HealthData) {
   if (!userId) return;
-  const { error } = await createClient()
-    .from("health_data")
-    .upsert({ user_id: userId, data });
-  if (error) {
+  try {
+    await setDoc(doc(firebaseDb(), "health_data", userId), {
+      json: JSON.stringify(data),
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
     console.error("Saving health data failed", error);
     toast.error("Could not save your changes. Check your connection and try again.");
   }
@@ -106,16 +111,16 @@ export async function flushSave() {
 }
 
 async function load() {
-  if (!hasEnvVars) {
+  if (!hasFirebase) {
     mode = "local";
     userId = null;
     cache = readLocal();
     loadedFor = "local";
     return;
   }
-  const supabase = createClient();
-  const { data: sess } = await supabase.auth.getSession();
-  const user = sess.session?.user ?? null;
+  const auth = firebaseAuth();
+  await auth.authStateReady();
+  const user = auth.currentUser;
 
   if (!user) {
     mode = "local";
@@ -126,18 +131,17 @@ async function load() {
   }
 
   mode = "cloud";
-  userId = user.id;
-  const { data: row, error } = await supabase
-    .from("health_data")
-    .select("data")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error) {
+  userId = user.uid;
+  let stored: HealthData | null = null;
+  try {
+    const snap = await getDoc(doc(firebaseDb(), "health_data", user.uid));
+    if (snap.exists()) {
+      const parsed = JSON.parse(String(snap.data().json)) as HealthData;
+      if (parsed?.version === 1) stored = parsed;
+    }
+  } catch (error) {
     console.error("Loading health data failed", error);
-    toast.error(
-      "Could not load your records. The database may not be set up yet (see supabase/migrations).",
-    );
+    toast.error("Could not load your records. Firestore may not be set up yet (see the setup notes).");
     // Keep the cache empty so nothing can overwrite real data that failed to load.
     cache = null;
     loadError = true;
@@ -145,22 +149,17 @@ async function load() {
     return;
   }
 
-  if (row?.data && (row.data as HealthData).version === 1) {
-    cache = normalise(row.data as HealthData);
+  if (stored) {
+    cache = normalise(stored);
   } else {
     cache = emptyHealthData(displayName(user));
     await saveCloud(cache);
   }
-  loadedFor = user.id;
+  loadedFor = user.uid;
 }
 
-function displayName(user: {
-  email?: string | null;
-  user_metadata?: Record<string, unknown>;
-}): string {
-  const meta = user.user_metadata ?? {};
-  const n = (meta.full_name ?? meta.name) as string | undefined;
-  return n?.trim() || user.email?.split("@")[0] || "My health";
+function displayName(user: User): string {
+  return user.displayName?.trim() || user.email?.split("@")[0] || "My health";
 }
 
 async function ensureLoaded() {
@@ -168,9 +167,10 @@ async function ensureLoaded() {
   loading = (async () => {
     try {
       let uid: string | null = null;
-      if (hasEnvVars) {
-        const { data } = await createClient().auth.getSession();
-        uid = data.session?.user.id ?? null;
+      if (hasFirebase) {
+        const auth = firebaseAuth();
+        await auth.authStateReady();
+        uid = auth.currentUser?.uid ?? null;
       }
       if (loadedFor !== null && loadedFor === (uid ?? "local") && cache) return;
       // A different person (or first visit): drop whatever was cached.

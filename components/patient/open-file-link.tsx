@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { deleteObject, getDownloadURL, ref } from "firebase/storage";
+import { firebaseStorage } from "@/lib/firebase/client";
 
 /** Opens an uploaded file. Private files get a short-lived signed link; demo files open directly. */
 export function OpenFileLink({
@@ -32,17 +33,16 @@ export function OpenFileLink({
   const open = async () => {
     setBusy(true);
     const win = window.open("", "_blank");
-    const { data, error } = await createClient()
-      .storage.from("medical-documents")
-      .createSignedUrl(path!, 300);
-    setBusy(false);
-    if (error || !data?.signedUrl) {
+    try {
+      const url = await getDownloadURL(ref(firebaseStorage(), path!));
+      setBusy(false);
+      if (win) win.location.href = url;
+      else window.location.href = url;
+    } catch {
+      setBusy(false);
       win?.close();
       toast.error("Could not open the file.");
-      return;
     }
-    if (win) win.location.href = data.signedUrl;
-    else window.location.href = data.signedUrl;
   };
 
   return (
@@ -55,5 +55,9 @@ export function OpenFileLink({
 
 export async function deleteStoredFile(path?: string) {
   if (!path) return;
-  await createClient().storage.from("medical-documents").remove([path]);
+  try {
+    await deleteObject(ref(firebaseStorage(), path));
+  } catch {
+    // Already gone.
+  }
 }

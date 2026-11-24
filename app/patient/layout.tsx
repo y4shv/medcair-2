@@ -1,3 +1,4 @@
+import { AuthGate } from "@/components/patient/auth-gate";
 import { PatientNav } from "@/components/patient/patient-nav";
 
 export default function PatientLayout({
@@ -8,7 +9,7 @@ export default function PatientLayout({
   return (
     <div className="min-h-screen bg-mist font-display text-ink">
       <PatientNav />
-      {children}
+      <AuthGate>{children}</AuthGate>
     </div>
   );
 }

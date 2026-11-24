@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { verifyRequest } from "@/lib/firebase/verify";
 import { AiNotConfiguredError, askClaude, parseJsonObject } from "@/lib/ai/claude";
 import { summarySchema } from "@/lib/ai/extract-schema";
 import type { HealthData } from "@/lib/health/types";
@@ -48,23 +48,19 @@ function digest(d: HealthData): string {
   return lines.join("\n").slice(0, 60000);
 }
 
-export async function POST() {
-  const supabase = await createClient();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) {
+export async function POST(request: Request) {
+  const user = await verifyRequest(request);
+  if (!user) {
     return NextResponse.json({ error: "Please sign in to use the AI summary." }, { status: 401 });
   }
 
-  // Read from the database, not from the request, so only this person's own data is used.
-  const { data: row, error } = await supabase
-    .from("health_data")
-    .select("data")
-    .eq("user_id", auth.user.id)
-    .maybeSingle();
-  if (error || !row?.data) {
-    return NextResponse.json({ error: "No records found yet. Add a report first." }, { status: 404 });
+  let data: HealthData;
+  try {
+    data = (await request.json()).data as HealthData;
+    if (!data || typeof data !== "object") throw new Error("no data");
+  } catch {
+    return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-  const data = row.data as HealthData;
   if (!data.labReports?.length && !data.medicines?.length && !data.records?.length) {
     return NextResponse.json({ error: "Add a report, medicine or record first, then ask for a summary." }, { status: 400 });
   }

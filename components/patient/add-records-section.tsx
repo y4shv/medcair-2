@@ -7,7 +7,8 @@ import { newId, todayIso } from "@/lib/health/format";
 import { applyExtraction } from "@/lib/health/ingest";
 import type { Extraction } from "@/lib/ai/extract-schema";
 import { getUserId, type StoreMode } from "@/lib/health/store";
-import { createClient } from "@/lib/supabase/client";
+import { ref, uploadBytes } from "firebase/storage";
+import { firebaseAuth, firebaseStorage } from "@/lib/firebase/client";
 import { buildSimulatedAbdmRecords } from "@/lib/health/demo-data";
 import { Btn, Field, Section, inputClass } from "./ui";
 
@@ -102,13 +103,12 @@ function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
     setBusy("uploading");
     const safe = f.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80);
     const path = `${uid}/${newId()}-${safe}`;
-    const { error: upErr } = await createClient()
-      .storage.from("medical-documents")
-      .upload(path, f, { contentType: f.type });
-    if (upErr) {
+    try {
+      await uploadBytes(ref(firebaseStorage(), path), f, { contentType: f.type });
+    } catch (err) {
       setBusy("");
-      console.error(upErr);
-      toast.error("Could not upload the file. The storage may not be set up yet.");
+      console.error(err);
+      toast.error("Could not upload the file. Firebase Storage may not be set up yet.");
       return;
     }
 
@@ -117,9 +117,10 @@ function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
     if (useAi) {
       setBusy("reading");
       try {
+        const token = await firebaseAuth().currentUser?.getIdToken();
         const res = await fetch("/api/ai/extract", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
           body: JSON.stringify({ path }),
         });
         const body = await res.json().catch(() => ({}));

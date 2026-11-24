@@ -1,34 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { hasEnvVars } from "@/lib/utils";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { authErrorMessage, firebaseAuth, hasFirebase } from "@/lib/firebase/client";
 
-// "Continue with Google" through Supabase. The Google provider has to be switched on
-// in the Supabase dashboard (Authentication > Providers > Google).
+// "Continue with Google" through Firebase Auth. Switch the Google provider on in the
+// Firebase console (Authentication > Sign-in method > Google).
 export function GoogleButton({ label = "Continue with Google" }: { label?: string }) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const start = async () => {
     setError(null);
-    if (!hasEnvVars) {
+    if (!hasFirebase) {
       setError("Sign-in is not set up on this site yet.");
       return;
     }
     setBusy(true);
     try {
-      const { error } = await createClient().auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/patient/dashboard`,
-          queryParams: { prompt: "select_account" },
-        },
-      });
-      if (error) throw error;
-      // The browser is now being sent to Google, so keep the button disabled.
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      await signInWithPopup(firebaseAuth(), provider);
+      router.push("/patient/dashboard");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not start Google sign-in.");
+      setError(authErrorMessage(e));
       setBusy(false);
     }
   };

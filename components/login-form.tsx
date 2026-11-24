@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { authErrorMessage, firebaseAuth, hasFirebase } from "@/lib/firebase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,19 +30,15 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
+      if (!hasFirebase) throw new Error("Sign-in is not set up on this site yet.");
+      await signInWithEmailAndPassword(firebaseAuth(), email, password);
       router.push("/patient/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(authErrorMessage(error));
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,7 @@ import { Sparkles } from "lucide-react";
 import type { AiSummary, HealthData } from "@/lib/health/types";
 import { flushSave, type StoreMode } from "@/lib/health/store";
 import { formatDateTime } from "@/lib/health/format";
+import { firebaseAuth } from "@/lib/firebase/client";
 import { Btn, Section } from "./ui";
 
 type Update = (fn: (d: HealthData) => HealthData) => boolean;
@@ -29,8 +30,15 @@ export function AiSummarySection({
     setBusy(true);
     setError("");
     try {
-      await flushSave(); // the server reads the saved copy
-      const res = await fetch("/api/ai/summary", { method: "POST" });
+      await flushSave();
+      const token = await firebaseAuth().currentUser?.getIdToken();
+      const { aiSummary: _old, ...rest } = data;
+      void _old;
+      const res = await fetch("/api/ai/summary", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+        body: JSON.stringify({ data: rest }),
+      });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(body.error || "Could not write the summary.");
