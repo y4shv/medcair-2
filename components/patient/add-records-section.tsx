@@ -7,8 +7,8 @@ import { newId, todayIso } from "@/lib/health/format";
 import { applyExtraction } from "@/lib/health/ingest";
 import type { Extraction } from "@/lib/ai/extract-schema";
 import { getUserId, type StoreMode } from "@/lib/health/store";
-import { ref, uploadBytes } from "firebase/storage";
-import { firebaseAuth, firebaseStorage } from "@/lib/firebase/client";
+import { firebaseAuth } from "@/lib/firebase/client";
+import { ALLOWED_TYPES, MAX_FILE_BYTES, prepareFile, saveFile } from "@/lib/health/files";
 import { buildSimulatedAbdmRecords } from "@/lib/health/demo-data";
 import { Btn, Field, Section, inputClass } from "./ui";
 
@@ -38,8 +38,6 @@ export function AddRecordsSection({
   );
 }
 
-const MAX_CLOUD_BYTES = 10 * 1024 * 1024;
-const ALLOWED = ["application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"];
 
 function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
   const cloud = mode === "cloud";
@@ -86,12 +84,12 @@ function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
   };
 
   const submitCloud = async (f: File) => {
-    if (!ALLOWED.includes(f.type)) {
-      toast.error("Please pick a PDF or a JPG, PNG or WebP photo.");
+    if (!ALLOWED_TYPES.includes(f.type)) {
+      toast.error("Please pick a PDF (under 5 MB) or a JPG, PNG or WebP photo.");
       return;
     }
-    if (f.size > MAX_CLOUD_BYTES) {
-      toast.error("This file is too big. Please pick a file under 10 MB.");
+    if (f.type === "application/pdf" && f.size > MAX_FILE_BYTES) {
+      toast.error("This PDF is too big. Please pick a PDF under 5 MB, or upload photos of the pages.");
       return;
     }
     const uid = getUserId();
@@ -101,14 +99,20 @@ function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
     }
     setResult("");
     setBusy("uploading");
-    const safe = f.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80);
-    const path = `${uid}/${newId()}-${safe}`;
+    let path = "";
+    let storedName = f.name;
     try {
-      await uploadBytes(ref(firebaseStorage(), path), f, { contentType: f.type });
+      const prepared = await prepareFile(f);
+      storedName = prepared.name;
+      path = await saveFile(uid, prepared.blob, prepared.mime, prepared.name);
     } catch (err) {
       setBusy("");
       console.error(err);
-      toast.error("Could not upload the file. Firebase Storage may not be set up yet.");
+      toast.error(
+        (err as Error).message === "too-big"
+          ? "This file is too big even after shrinking. Please pick a smaller one."
+          : "Could not save the file. Firestore may not be set up yet.",
+      );
       return;
     }
 
@@ -132,7 +136,7 @@ function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
     }
 
     const ok = update((d) =>
-      applyExtraction(d, extraction, { path, name: f.name }, {
+      applyExtraction(d, extraction, { path, name: storedName }, {
         title: title.trim(),
         date: date,
         source: source.trim(),

@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
-import { deleteObject, getDownloadURL, ref } from "firebase/storage";
-import { firebaseStorage } from "@/lib/firebase/client";
+import { deleteFile, loadFileBlob } from "@/lib/health/files";
 
 /** Opens an uploaded file. Private files get a short-lived signed link; demo files open directly. */
 export function OpenFileLink({
@@ -34,7 +33,7 @@ export function OpenFileLink({
     setBusy(true);
     const win = window.open("", "_blank");
     try {
-      const url = await getDownloadURL(ref(firebaseStorage(), path!));
+      const url = URL.createObjectURL(await loadFileBlob(path!));
       setBusy(false);
       if (win) win.location.href = url;
       else window.location.href = url;
@@ -53,11 +52,4 @@ export function OpenFileLink({
   );
 }
 
-export async function deleteStoredFile(path?: string) {
-  if (!path) return;
-  try {
-    await deleteObject(ref(firebaseStorage(), path));
-  } catch {
-    // Already gone.
-  }
-}
+export const deleteStoredFile = deleteFile;

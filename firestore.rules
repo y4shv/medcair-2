@@ -2,6 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Each patient can read and write only their own health document.
+    match /user_files/{uid}/files/{fileId} {
+      // Uploaded documents (stored as pieces, see lib/health/files.ts).
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
     match /health_data/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }

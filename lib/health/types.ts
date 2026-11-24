@@ -20,7 +20,7 @@ export interface HealthRecord {
   /** Uploaded file (kept in this browser only for the prototype). */
   fileName?: string;
   fileUrl?: string;
-  /** Path of the file in the private "medical-documents" storage bucket (signed-in accounts). */
+  /** Path ("uid/fileId") of the uploaded file kept in Firestore (signed-in accounts). */
   filePath?: string;
   /** True when the entry came from the simulated ABHA/ABDM fetch. */
   simulated?: boolean;
@@ -53,7 +53,7 @@ export interface LabReport {
   date: string;
   /** Link to the original document. Missing for simulated entries. */
   documentUrl?: string;
-  /** Path of the uploaded original in the private storage bucket. */
+  /** Path of the uploaded original in Firestore. */
   documentPath?: string;
   results: LabResult[];
   simulated?: boolean;

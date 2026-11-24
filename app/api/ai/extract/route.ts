@@ -41,29 +41,36 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
-  // Only the person's own folder (storage rules enforce this too).
+  // Only the person's own folder (Firestore rules enforce this too).
   if (!path.startsWith(`${user.uid}/`) || path.includes("..")) {
     return NextResponse.json({ error: "That file is not yours." }, { status: 403 });
   }
 
-  // Download with the person's own token, so the storage rules decide what is readable.
-  const bucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-  const dl = await fetch(
-    `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`,
-    { headers: { Authorization: `Firebase ${user.token}` } },
-  );
-  if (!dl.ok) {
+  // Read the pieces from Firestore with the person's own token, so the rules decide what is readable.
+  const [, fileId] = path.split("/");
+  const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const base = `https://firestore.googleapis.com/v1/projects/${project}/databases/(default)/documents/user_files/${user.uid}/files`;
+  const get = async (id: string) => {
+    const r = await fetch(`${base}/${encodeURIComponent(id)}`, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    return r.ok ? ((await r.json()) as { fields?: Record<string, { stringValue?: string; integerValue?: string }> }) : null;
+  };
+  const meta = fileId ? await get(fileId) : null;
+  if (!meta?.fields) {
     return NextResponse.json({ error: "Could not find the uploaded file." }, { status: 404 });
   }
-  const bytes = Buffer.from(await dl.arrayBuffer());
-  const headerType = (dl.headers.get("content-type") ?? "").split(";")[0].trim();
-  const mime =
-    headerType && headerType !== "application/octet-stream"
-      ? headerType
-      : path.toLowerCase().endsWith(".pdf")
-        ? "application/pdf"
-        : "";
-  const data = bytes.toString("base64");
+  const mime = meta.fields.mime?.stringValue ?? "";
+  const pieces = Number(meta.fields.pieces?.integerValue ?? 0);
+  let data = "";
+  for (let i = 0; i < pieces; i++) {
+    const piece = await get(`${fileId}.${i}`);
+    data += piece?.fields?.data?.stringValue ?? "";
+  }
+  if (!data) {
+    return NextResponse.json({ error: "Could not read the uploaded file." }, { status: 404 });
+  }
+  const bytes = Buffer.from(data, "base64");
 
   let fileBlock: ClaudeContent;
   if (mime === "application/pdf") {
