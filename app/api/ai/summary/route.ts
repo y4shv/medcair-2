@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyRequest } from "@/lib/firebase/verify";
-import { AiNotConfiguredError, askClaude, parseJsonObject } from "@/lib/ai/claude";
+import { AiNotConfiguredError, askAi, parseJsonObject } from "@/lib/ai/gemini";
 import { summarySchema } from "@/lib/ai/extract-schema";
 import type { HealthData } from "@/lib/health/types";
 
@@ -66,9 +66,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const text = await askClaude({
+    const text = await askAi({
       system: SYSTEM,
-      content: [{ type: "text", text: digest(data) }],
+      parts: [{ text: digest(data) }],
       maxTokens: 2000,
     });
     const summary = summarySchema.parse(parseJsonObject(text));

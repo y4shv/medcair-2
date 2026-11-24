@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyRequest } from "@/lib/firebase/verify";
-import { AiNotConfiguredError, askClaude, parseJsonObject, type ClaudeContent } from "@/lib/ai/claude";
+import { AiNotConfiguredError, askAi, parseJsonObject, type AiPart } from "@/lib/ai/gemini";
 import { extractionSchema } from "@/lib/ai/extract-schema";
 
 export const maxDuration = 120;
@@ -72,22 +72,22 @@ export async function POST(request: Request) {
   }
   const bytes = Buffer.from(data, "base64");
 
-  let fileBlock: ClaudeContent;
+  let fileBlock: AiPart;
   if (mime === "application/pdf") {
-    fileBlock = { type: "document", source: { type: "base64", media_type: "application/pdf", data } };
+    fileBlock = { inlineData: { mimeType: "application/pdf", data } };
   } else if (IMAGE_TYPES.includes(mime)) {
     if (bytes.length > 5 * 1024 * 1024) {
       return NextResponse.json({ error: "Photos must be under 5 MB for the AI to read them." }, { status: 413 });
     }
-    fileBlock = { type: "image", source: { type: "base64", media_type: mime, data } };
+    fileBlock = { inlineData: { mimeType: mime, data } };
   } else {
     return NextResponse.json({ error: "The AI can read PDFs and photos (JPG, PNG, WebP)." }, { status: 415 });
   }
 
   try {
-    const text = await askClaude({
+    const text = await askAi({
       system: SYSTEM,
-      content: [fileBlock, { type: "text", text: "Read this document and return the JSON object." }],
+      parts: [fileBlock, { text: "Read this document and return the JSON object." }],
       maxTokens: 6000,
     });
     const parsed = extractionSchema.parse(parseJsonObject(text));

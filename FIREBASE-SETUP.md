@@ -7,7 +7,7 @@
    into the Rules tab and publish.
 4. **Project settings > Your apps > Web app**: copy the config into `.env.local` and into
    Vercel's environment variables (see `.env.example`).
-5. Add `ANTHROPIC_API_KEY` to `.env.local` and Vercel for the AI features.
+5. Get a free key at https://aistudio.google.com/apikey and add `GEMINI_API_KEY` to `.env.local` and Vercel for the AI features.
 
 Data layout: Firestore `health_data/{uid}` holds one JSON string per patient. Uploaded files
 (PDFs up to 5 MB, photos shrunk automatically) are stored in Firestore too, as base64 pieces under
