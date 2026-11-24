@@ -1,11 +1,14 @@
 "use client";
 
-import { Clock } from "lucide-react";
+import { Clock, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import type { HealthData } from "@/lib/health/types";
 import { estimateRefill, formatDate, formatTime } from "@/lib/health/format";
 import { Pill as Tag, Section } from "./ui";
 
-export function MedicinesSection({ data }: { data: HealthData }) {
+type Update = (fn: (d: HealthData) => HealthData) => boolean;
+
+export function MedicinesSection({ data, update }: { data: HealthData; update: Update }) {
   return (
     <Section
       id="medicines"
@@ -44,6 +47,20 @@ export function MedicinesSection({ data }: { data: HealthData }) {
                   Estimated refill by: {formatDate(refillBy)}{" "}
                   {low && <Tag tone="watch">Refill soon</Tag>}
                 </p>
+                {!m.simulated && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!window.confirm(`Remove ${m.name} from your medicines?`)) return;
+                      update((d) => ({ ...d, medicines: d.medicines.filter((x) => x.id !== m.id) }));
+                      toast.success("Medicine removed");
+                    }}
+                    className="mt-2 inline-flex min-h-11 items-center gap-1.5 text-base font-bold text-status-critical hover:underline"
+                    aria-label={`Remove ${m.name}`}
+                  >
+                    <Trash2 className="size-4" aria-hidden /> Remove
+                  </button>
+                )}
                 {m.simulated && (
                   <p className="mt-1">
                     <Tag tone="info">Simulated demo entry</Tag>

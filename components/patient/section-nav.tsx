@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export const sections = [
+  { id: "summary", label: "AI summary" },
+  { id: "trends", label: "Graphs" },
   { id: "timeline", label: "Timeline" },
   { id: "medicines", label: "Medicines" },
   { id: "reports", label: "Reports" },

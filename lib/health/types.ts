@@ -20,6 +20,8 @@ export interface HealthRecord {
   /** Uploaded file (kept in this browser only for the prototype). */
   fileName?: string;
   fileUrl?: string;
+  /** Path of the file in the private "medical-documents" storage bucket (signed-in accounts). */
+  filePath?: string;
   /** True when the entry came from the simulated ABHA/ABDM fetch. */
   simulated?: boolean;
 }
@@ -51,6 +53,8 @@ export interface LabReport {
   date: string;
   /** Link to the original document. Missing for simulated entries. */
   documentUrl?: string;
+  /** Path of the uploaded original in the private storage bucket. */
+  documentPath?: string;
   results: LabResult[];
   simulated?: boolean;
 }
@@ -111,6 +115,13 @@ export interface Caregiver {
   revoked: boolean;
 }
 
+export interface AiSummary {
+  generatedAt: string;
+  overview: string;
+  keyPoints: string[];
+  questionsForDoctor: string[];
+}
+
 export interface HealthData {
   version: 1;
   patient: PatientProfile;
@@ -122,4 +133,5 @@ export interface HealthData {
   shareLinks: ShareLink[];
   caregivers: Caregiver[];
   abdmFetched: boolean;
+  aiSummary?: AiSummary;
 }

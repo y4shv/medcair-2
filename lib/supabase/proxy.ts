@@ -54,6 +54,8 @@ export async function updateSession(request: NextRequest) {
     // Share links are opened by people the patient chooses, without an account.
     !request.nextUrl.pathname.startsWith("/share") &&
     !request.nextUrl.pathname.startsWith("/auth") &&
+    // API routes check the session themselves and answer 401 instead of redirecting.
+    !request.nextUrl.pathname.startsWith("/api/") &&
     !request.nextUrl.pathname.startsWith("/demo") &&
     // Demo visitors (see app/demo/route.ts) browse the fake data without an account.
     !(

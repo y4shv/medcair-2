@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { clearStore, flushSave } from "@/lib/health/store";
 
 const links = [
   { href: "/patient/dashboard", label: "My health" },
@@ -17,10 +18,12 @@ export function PatientNav() {
 
   const logout = async () => {
     try {
+      await flushSave();
       await createClient().auth.signOut();
     } catch {
       // No Supabase set up (local demo). Just go to the login page.
     }
+    clearStore();
     router.push("/auth/login");
   };
 

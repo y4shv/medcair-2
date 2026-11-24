@@ -15,7 +15,7 @@ import { Btn, Field, Loading, Pill, Section, inputClass } from "@/components/pat
 // If booking comes back, add it here (slots, clinic search) as a separate flow.
 
 export default function AppointmentsPage() {
-  const { data, update } = useHealthData();
+  const { data, update, failed } = useHealthData();
   const [doctorName, setDoctorName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -23,7 +23,7 @@ export default function AppointmentsPage() {
   const [notes, setNotes] = useState("");
   const [reminder, setReminder] = useState<ReminderOption>("1d");
 
-  if (!data) return <Loading />;
+  if (!data) return <Loading failed={failed} />;
 
   const sorted = [...data.appointments].sort(
     (a, b) => appointmentStart(a).getTime() - appointmentStart(b).getTime(),

@@ -1,7 +1,9 @@
 "use client";
 
-import { FileText, FlaskConical, Pill, Stethoscope, ClipboardList } from "lucide-react";
+import { FileText, FlaskConical, Pill, Stethoscope, ClipboardList, Trash2 } from "lucide-react";
 import type { HealthData } from "@/lib/health/types";
+import { toast } from "sonner";
+import { OpenFileLink, deleteStoredFile } from "./open-file-link";
 import { formatDate } from "@/lib/health/format";
 import { Pill as Tag, Section } from "./ui";
 
@@ -16,6 +18,8 @@ type Entry = {
   simulated?: boolean;
   fileUrl?: string;
   fileName?: string;
+  filePath?: string;
+  type: "record" | "lab";
 };
 
 export function buildTimeline(data: HealthData): Entry[] {
@@ -44,6 +48,8 @@ export function buildTimeline(data: HealthData): Entry[] {
     simulated: r.simulated,
     fileUrl: r.fileUrl,
     fileName: r.fileName,
+    filePath: r.filePath,
+    type: "record",
   }));
   const fromLabs: Entry[] = data.labReports.map((l) => ({
     id: l.id,
@@ -53,12 +59,29 @@ export function buildTimeline(data: HealthData): Entry[] {
     title: l.title,
     source: l.source,
     simulated: l.simulated,
+    filePath: l.documentPath,
+    fileUrl: l.documentUrl,
+    fileName: l.title,
+    type: "lab",
   }));
   return [...fromRecords, ...fromLabs].sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function HealthTimeline({ data }: { data: HealthData }) {
+type Update = (fn: (d: HealthData) => HealthData) => boolean;
+
+export function HealthTimeline({ data, update }: { data: HealthData; update: Update }) {
   const entries = buildTimeline(data);
+
+  const remove = async (e: Entry) => {
+    if (!window.confirm(`Remove "${e.title}" from your records?${e.filePath ? " The uploaded file is deleted too." : ""}`)) return;
+    update((d) => ({
+      ...d,
+      records: e.type === "record" ? d.records.filter((r) => r.id !== e.id) : d.records,
+      labReports: e.type === "lab" ? d.labReports.filter((l) => l.id !== e.id) : d.labReports,
+    }));
+    await deleteStoredFile(e.filePath);
+    toast.success("Removed");
+  };
 
   return (
     <Section
@@ -83,20 +106,28 @@ export function HealthTimeline({ data }: { data: HealthData }) {
                 <p className="text-xl font-bold">{e.title}</p>
                 <p>From: {e.source}</p>
                 {e.details && <p className="text-ink">{e.details}</p>}
-                {e.fileUrl && (
-                  <a
-                    href={e.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="font-semibold text-care-deep underline"
-                  >
-                    Open file{e.fileName ? `: ${e.fileName}` : ""}
-                  </a>
+                {(e.filePath || e.fileUrl) && (
+                  <OpenFileLink
+                    path={e.filePath}
+                    url={e.fileUrl}
+                    label={e.type === "lab" ? "Open original report" : `Open file${e.fileName ? `: ${e.fileName}` : ""}`}
+                    className="inline-flex min-h-11 items-center gap-1 font-semibold text-care-deep underline"
+                  />
                 )}
                 {e.simulated && (
                   <p className="mt-1">
                     <Tag tone="info">Simulated demo entry</Tag>
                   </p>
+                )}
+                {!e.simulated && (
+                  <button
+                    type="button"
+                    onClick={() => void remove(e)}
+                    className="mt-1 inline-flex min-h-11 items-center gap-1.5 text-base font-bold text-status-critical hover:underline"
+                    aria-label={`Remove ${e.title}`}
+                  >
+                    <Trash2 className="size-4" aria-hidden /> Remove
+                  </button>
                 )}
               </li>
             );

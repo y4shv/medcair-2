@@ -108,6 +108,13 @@ export function Pill({
   );
 }
 
-export function Loading() {
+export function Loading({ failed }: { failed?: boolean }) {
+  if (failed)
+    return (
+      <p role="alert" className="p-6 text-lg">
+        Could not load your records. Please refresh the page. If this keeps happening, the database
+        setup may be incomplete.
+      </p>
+    );
   return <p className="p-6 text-lg">Loading your records...</p>;
 }

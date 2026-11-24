@@ -50,7 +50,7 @@ export default function SharePage() {
 
       <h1 className="text-3xl font-bold">Health summary</h1>
       <p className="mt-1">
-        {p.patient.name}, {p.patient.age} years
+        {p.patient.name}{p.patient.age ? `, ${p.patient.age} years` : ""}
       </p>
       {p.patient.conditions.length > 0 && (
         <p>Known conditions: {p.patient.conditions.join(", ")}</p>

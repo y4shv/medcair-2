@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Equal, ExternalLink } from "lucide-react";
+import { OpenFileLink } from "./open-file-link";
 import type { HealthData, LabResult } from "@/lib/health/types";
 import { formatDate } from "@/lib/health/format";
 import { analyseResult } from "@/lib/health/range";
@@ -86,7 +87,7 @@ export function ReportsSection({ data }: { data: HealthData }) {
                   <Pill tone="info">Simulated demo entry</Pill>
                 </p>
               )}
-              {r.documentUrl ? (
+              {r.documentUrl && !r.documentPath ? (
                 <a
                   href={r.documentUrl}
                   target="_blank"
@@ -95,6 +96,12 @@ export function ReportsSection({ data }: { data: HealthData }) {
                 >
                   Open the original report <ExternalLink className="size-4" aria-hidden />
                 </a>
+              ) : r.documentPath ? (
+                <OpenFileLink
+                  path={r.documentPath}
+                  label="Open the original report"
+                  className="mt-1.5 inline-flex min-h-11 items-center gap-1 text-base font-bold text-care underline hover:text-care-deep"
+                />
               ) : (
                 <p className="mt-1.5 text-base text-ink-muted">No original document on file.</p>
               )}

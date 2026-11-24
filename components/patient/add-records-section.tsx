@@ -4,6 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { HealthData, HealthRecord, Medicine } from "@/lib/health/types";
 import { newId, todayIso } from "@/lib/health/format";
+import { applyExtraction } from "@/lib/health/ingest";
+import type { Extraction } from "@/lib/ai/extract-schema";
+import { getUserId, type StoreMode } from "@/lib/health/store";
+import { createClient } from "@/lib/supabase/client";
 import { buildSimulatedAbdmRecords } from "@/lib/health/demo-data";
 import { Btn, Field, Section, inputClass } from "./ui";
 
@@ -12,88 +16,249 @@ type Update = (fn: (d: HealthData) => HealthData) => boolean;
 // Files are kept in this browser only, so keep them small.
 const MAX_BYTES = 1.5 * 1024 * 1024;
 
-export function AddRecordsSection({ data, update }: { data: HealthData; update: Update }) {
+export function AddRecordsSection({
+  data,
+  update,
+  mode,
+}: {
+  data: HealthData;
+  update: Update;
+  mode: StoreMode;
+}) {
   return (
     <Section id="add" title="Add records" intro="Put new papers and medicines in one place.">
       <div className="space-y-8">
-        <UploadForm update={update} />
+        <UploadForm update={update} mode={mode} />
         <PrescriptionForm update={update} />
-        <AbdmDemo data={data} update={update} />
+        <ProfileForm data={data} update={update} />
+        {mode === "local" && <AbdmDemo data={data} update={update} />}
       </div>
     </Section>
   );
 }
 
-function UploadForm({ update }: { update: Update }) {
+const MAX_CLOUD_BYTES = 10 * 1024 * 1024;
+const ALLOWED = ["application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"];
+
+function UploadForm({ update, mode }: { update: Update; mode: StoreMode }) {
+  const cloud = mode === "cloud";
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState(todayIso());
+  const [date, setDate] = useState("");
   const [source, setSource] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [useAi, setUseAi] = useState(true);
+  const [busy, setBusy] = useState<"" | "uploading" | "reading">("");
+  const [result, setResult] = useState("");
   const [inputKey, setInputKey] = useState(0);
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
-    if (file.size > MAX_BYTES) {
+  const finish = () => {
+    setTitle("");
+    setSource("");
+    setDate("");
+    setFile(null);
+    setInputKey((k) => k + 1);
+  };
+
+  const submitLocal = (f: File) => {
+    if (f.size > MAX_BYTES) {
       toast.error("This file is too big. Please pick a file under 1.5 MB.");
       return;
     }
     const reader = new FileReader();
     reader.onerror = () => toast.error("Could not read this file.");
     reader.onload = () => {
-      const record: HealthRecord = {
-        id: newId(),
-        kind: "document",
-        date,
-        title: title.trim() || file.name,
-        source: source.trim() || "Added by me",
-        fileName: file.name,
-        fileUrl: String(reader.result),
-      };
-      if (update((d) => ({ ...d, records: [record, ...d.records] }))) {
+      const ok = update((d) =>
+        applyExtraction(d, null, { name: f.name, url: String(reader.result) }, {
+          title: title.trim() || f.name,
+          date: date || todayIso(),
+          source: source.trim(),
+        }),
+      );
+      if (ok) {
         toast.success("File added to your timeline");
-        setTitle("");
-        setSource("");
-        setFile(null);
-        setInputKey((k) => k + 1);
+        finish();
       } else {
         toast.error("Could not save the file. The browser storage may be full.");
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(f);
+  };
+
+  const submitCloud = async (f: File) => {
+    if (!ALLOWED.includes(f.type)) {
+      toast.error("Please pick a PDF or a JPG, PNG or WebP photo.");
+      return;
+    }
+    if (f.size > MAX_CLOUD_BYTES) {
+      toast.error("This file is too big. Please pick a file under 10 MB.");
+      return;
+    }
+    const uid = getUserId();
+    if (!uid) {
+      toast.error("Please sign in again.");
+      return;
+    }
+    setResult("");
+    setBusy("uploading");
+    const safe = f.name.replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-80);
+    const path = `${uid}/${newId()}-${safe}`;
+    const { error: upErr } = await createClient()
+      .storage.from("medical-documents")
+      .upload(path, f, { contentType: f.type });
+    if (upErr) {
+      setBusy("");
+      console.error(upErr);
+      toast.error("Could not upload the file. The storage may not be set up yet.");
+      return;
+    }
+
+    let extraction: Extraction | null = null;
+    let note = "";
+    if (useAi) {
+      setBusy("reading");
+      try {
+        const res = await fetch("/api/ai/extract", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ path }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok) extraction = body.extraction as Extraction;
+        else note = body.error || "The AI could not read this file.";
+      } catch {
+        note = "Could not reach the AI. The file was saved without reading it.";
+      }
+    }
+
+    const ok = update((d) =>
+      applyExtraction(d, extraction, { path, name: f.name }, {
+        title: title.trim(),
+        date: date,
+        source: source.trim(),
+      }),
+    );
+    setBusy("");
+    if (!ok) {
+      toast.error("Could not save. Please try again.");
+      return;
+    }
+    if (extraction) {
+      const labs = extraction.labResults.length;
+      const meds = extraction.medicines.length;
+      const bits = [labs && `${labs} lab result${labs === 1 ? "" : "s"}`, meds && `${meds} medicine${meds === 1 ? "" : "s"}`].filter(Boolean);
+      setResult(
+        bits.length
+          ? `The AI found ${bits.join(" and ")} and added them. Please check them against your paper.`
+          : "File saved. The AI did not find lab results or medicines in it.",
+      );
+      toast.success("File added and read");
+    } else {
+      setResult(note ? `File saved. ${note}` : "File saved to your timeline.");
+      toast.success("File added to your timeline");
+    }
+    finish();
+  };
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file || busy) return;
+    if (cloud) void submitCloud(file);
+    else submitLocal(file);
   };
 
   return (
     <form onSubmit={submit} className="grid gap-4 sm:max-w-xl">
       <h3 className="text-xl font-bold">Upload a PDF or photo</h3>
-      <Field label="File (PDF or image)" htmlFor="up-file">
+      <Field label="File (PDF or photo)" htmlFor="up-file">
         <input
           key={inputKey}
           id="up-file"
           type="file"
-          accept="application/pdf,image/*"
+          accept={cloud ? "application/pdf,image/png,image/jpeg,image/webp,image/gif" : "application/pdf,image/*"}
           required
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           className={inputClass}
         />
       </Field>
-      <Field label="Name for this file" htmlFor="up-title">
+      <Field label="Name for this file (optional)" htmlFor="up-title">
         <input id="up-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Blood test, March" className={inputClass} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Date on the paper" htmlFor="up-date">
-          <input id="up-date" type="date" required value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
+        <Field label={useAi && cloud ? "Date on the paper (optional)" : "Date on the paper"} htmlFor="up-date">
+          <input id="up-date" type="date" required={!(useAi && cloud)} value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
         </Field>
-        <Field label="From (clinic or lab)" htmlFor="up-source">
+        <Field label="From (clinic or lab, optional)" htmlFor="up-source">
           <input id="up-source" value={source} onChange={(e) => setSource(e.target.value)} className={inputClass} />
         </Field>
       </div>
-      <Btn type="submit" className="sm:w-fit">
-        Add file
+      {cloud && (
+        <label className="flex min-h-11 items-start gap-3 text-base">
+          <input
+            type="checkbox"
+            checked={useAi}
+            onChange={(e) => setUseAi(e.target.checked)}
+            className="mt-1 size-5 accent-[var(--care)]"
+          />
+          <span>
+            <b>Read this file with AI.</b> It finds the test results and medicines and fills in your
+            timeline, graphs and summary. Leave the date empty to use the date on the paper.
+          </span>
+        </label>
+      )}
+      <Btn type="submit" className="sm:w-fit" disabled={!!busy}>
+        {busy === "uploading" ? "Uploading..." : busy === "reading" ? "Reading your file..." : "Add file"}
       </Btn>
+      <div aria-live="polite" className="text-base">
+        {busy === "reading" && <p className="text-ink-muted">The AI is reading your file. This can take up to a minute.</p>}
+        {result && <p className="font-semibold text-care-deep">{result}</p>}
+      </div>
       <p className="text-base text-ink-muted">
-        The file is kept on this device only. The app does not read the numbers inside it yet.
+        {cloud
+          ? "Your file is stored privately in your account. Only you can open it. The AI reads it only to fill in these records, and can make mistakes, so check the numbers."
+          : "Demo mode: the file stays in this browser only and is not read. Create an account to store files safely and read them with AI."}
       </p>
+    </form>
+  );
+}
+
+function ProfileForm({ data, update }: { data: HealthData; update: Update }) {
+  const [name, setName] = useState(data.patient.name);
+  const [age, setAge] = useState(data.patient.age ? String(data.patient.age) : "");
+  const [conditions, setConditions] = useState(data.patient.conditions.join(", "));
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const ok = update((d) => ({
+      ...d,
+      patient: {
+        name: name.trim() || d.patient.name,
+        age: Math.max(0, Math.round(Number(age) || 0)),
+        conditions: conditions.split(",").map((c) => c.trim()).filter(Boolean),
+      },
+    }));
+    if (ok) toast.success("Details saved");
+    else toast.error("Could not save. Please try again.");
+  };
+
+  return (
+    <form onSubmit={submit} className="grid gap-4 sm:max-w-xl">
+      <h3 className="text-xl font-bold">About me</h3>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="sm:col-span-2">
+          <Field label="Name" htmlFor="me-name">
+            <input id="me-name" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+          </Field>
+        </div>
+        <Field label="Age" htmlFor="me-age">
+          <input id="me-age" type="number" min={0} max={120} value={age} onChange={(e) => setAge(e.target.value)} className={inputClass} />
+        </Field>
+      </div>
+      <Field label="Health conditions (separate with commas)" htmlFor="me-cond">
+        <input id="me-cond" value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="Type 2 diabetes, High blood pressure" className={inputClass} />
+      </Field>
+      <Btn type="submit" variant="outline" className="sm:w-fit">
+        Save my details
+      </Btn>
     </form>
   );
 }
